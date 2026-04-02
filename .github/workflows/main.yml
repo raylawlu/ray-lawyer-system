@@ -51,5 +51,5 @@ jobs:
           file: ./backend/api/Dockerfile
           push: true
           tags: |
-            ghcr.io/raylawlu/ray-lawyer-api:0.1.0
             ghcr.io/raylawlu/ray-lawyer-api:latest
+            ghcr.io/raylawlu/ray-lawyer-api:sha-${{ github.sha }}
