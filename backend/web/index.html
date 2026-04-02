@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ray律师案件管理系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { law: { navy: '#0f172a', gold: '#d4af37', light: '#f8fafc', gray: '#64748b' } },
+                    fontFamily: { serif: ['"Noto Serif SC"', 'serif'], sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; background-attachment: fixed; }
+        .bg-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px); z-index: -1; }
+        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+        .law-title { font-family: 'Noto Serif SC', serif; }
+        .dragging { opacity: 0.5; background-color: #f8fafc; border: 2px dashed #d4af37; }
+        .drag-over { border-top: 2px solid #d4af37; }
+    </style>
+</head>
+<body class="text-gray-800 h-screen overflow-hidden flex items-center justify-center">
+    <div class="bg-overlay"></div>
+
+    <!-- 登录界面 -->
+    <div id="login-screen" class="glass-panel p-10 rounded-2xl w-full max-w-md mx-4 transform transition-all duration-500">
+        <div class="text-center mb-8">
+            <div class="inline-block p-4 rounded-full bg-law-navy text-law-gold mb-4 shadow-lg"><i class="fa-solid fa-scale-balanced text-4xl"></i></div>
+            <h1 class="law-title text-3xl font-bold text-law-navy mb-2">Ray律师案件管理系统</h1>
+        </div>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">账号</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><i class="fa-solid fa-user"></i></span>
+                    <input type="text" id="username-input" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-law-gold outline-none" placeholder="请输入账号">
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">密码</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><i class="fa-solid fa-lock"></i></span>
+                    <input type="password" id="password-input" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-law-gold outline-none" placeholder="请输入密码" onkeypress="handleLoginKeyPress(event)">
+                </div>
+                <p id="login-error" class="text-red-500 text-sm mt-2 hidden"><i class="fa-solid fa-circle-exclamation mr-1"></i>账号或密码错误</p>
+            </div>
+            <button onclick="login()" class="w-full bg-law-navy hover:bg-gray-800 text-white font-semibold py-3 px-4 rounded-lg transition-colors shadow-md mt-4">进入系统</button>
+        </div>
+    </div>
+
+    <!-- 主系统界面 -->
+    <div id="app-screen" class="hidden w-full h-full flex flex-col md:flex-row">
+        <!-- 侧边栏 -->
+        <aside class="w-full md:w-64 bg-law-navy text-white flex flex-col shadow-2xl z-10">
+            <div class="p-6 flex items-center space-x-3 border-b border-gray-700">
+                <i class="fa-solid fa-scale-balanced text-law-gold text-2xl"></i>
+                <div>
+                    <h2 class="law-title text-lg font-bold tracking-wide">Ray Law System</h2>
+                    <p class="text-xs text-gray-400 mt-1">当前用户: <span id="current-user-display" class="text-law-gold"></span></p>
+                </div>
+            </div>
+            <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg bg-law-gold/20 text-law-gold transition-colors"><i class="fa-solid fa-list-check w-5"></i><span>待办任务</span></button>
+                <button onclick="switchTab('cases')" id="nav-cases" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-white/10 text-gray-300 transition-colors"><i class="fa-solid fa-folder-open w-5"></i><span>案件管理</span></button>
+                <button onclick="switchTab('completed')" id="nav-completed" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-white/10 text-gray-300 transition-colors"><i class="fa-solid fa-check-double w-5"></i><span>已完成任务</span></button>
+                <div class="my-4 border-t border-gray-700"></div>
+                <button onclick="switchTab('profile')" id="nav-profile" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-white/10 text-gray-300 transition-colors"><i class="fa-solid fa-user-gear w-5"></i><span>个人中心</span></button>
+                <button onclick="switchTab('users')" id="nav-users" class="nav-btn hidden w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-white/10 text-gray-300 transition-colors"><i class="fa-solid fa-users-cog w-5"></i><span>用户管理 (Admin)</span></button>
+            </nav>
+            <div class="p-4 border-t border-gray-700">
+                <button onclick="logout()" class="w-full flex items-center justify-center space-x-2 px-4 py-2 rounded-lg border border-gray-600 hover:bg-gray-800 text-gray-300 transition-colors"><i class="fa-solid fa-sign-out-alt"></i><span>退出登录</span></button>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 h-full overflow-y-auto bg-gray-50/90 backdrop-blur-sm p-4 md:p-8 relative">
+            
+            <!-- 1. 待办任务视图 -->
+            <div id="view-dashboard" class="view-section">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="law-title text-3xl font-bold text-law-navy">待办任务</h2>
+                    <button onclick="openTaskModal()" class="bg-law-gold hover:bg-yellow-600 text-white px-5 py-2.5 rounded-lg shadow-md transition-colors font-medium flex items-center"><i class="fa-solid fa-plus mr-2"></i> 添加任务</button>
+                </div>
+                <p class="text-sm text-gray-500 mb-4"><i class="fa-solid fa-info-circle mr-1"></i> 提示：按住任务列表项可上下拖拽排序。</p>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-0" id="task-list-container"></div>
+                </div>
+            </div>
+
+            <!-- 2. 案件管理视图 -->
+            <div id="view-cases" class="view-section hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="law-title text-3xl font-bold text-law-navy">案件管理</h2>
+                    <div class="flex space-x-3">
+                        <button onclick="openCaseModal()" class="bg-law-navy hover:bg-gray-800 text-white px-5 py-2.5 rounded-lg shadow-md transition-colors font-medium flex items-center"><i class="fa-solid fa-folder-plus mr-2"></i> 添加新案件</button>
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-4 flex gap-4 items-center justify-between">
+                    <div class="flex space-x-2 bg-gray-100 p-1 rounded-lg">
+                        <button onclick="setCaseTab('ongoing')" id="tab-ongoing" class="px-4 py-2 text-sm font-medium rounded-md bg-white shadow-sm text-law-navy transition-all">正在进行的案件</button>
+                        <button onclick="setCaseTab('completed')" id="tab-completed" class="px-4 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 transition-all">已经完成的案件</button>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-500 mb-4"><i class="fa-solid fa-info-circle mr-1"></i> 提示：按住案件行可上下拖拽排序。</p>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 text-gray-600 text-sm uppercase tracking-wider border-b border-gray-200">
+                                <th class="px-6 py-4 font-medium w-10"></th>
+                                <th class="px-6 py-4 font-medium">案件号</th>
+                                <th class="px-6 py-4 font-medium w-1/3">案件名称 & 最新动态</th>
+                                <th class="px-6 py-4 font-medium">客户名称</th>
+                                <th class="px-6 py-4 font-medium" id="case-status-header">任务DL</th>
+                                <th class="px-6 py-4 font-medium text-right">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="case-list-body" class="divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 3. 案件详情页 -->
+            <div id="view-case-detail" class="view-section hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <button onclick="switchTab('cases')" class="text-law-gray hover:text-law-navy transition-colors flex items-center"><i class="fa-solid fa-arrow-left mr-2"></i> 返回</button>
+                    <div class="flex space-x-3">
+                        <button id="btn-delete-case" onclick="promptDeleteCase()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg shadow transition-colors text-sm flex items-center"><i class="fa-solid fa-trash mr-2"></i> 删除案件</button>
+                        <button onclick="openEditCaseModal()" class="bg-law-navy hover:bg-gray-800 text-white px-4 py-2 rounded-lg shadow transition-colors text-sm flex items-center"><i class="fa-solid fa-pen-to-square mr-2"></i> 修改案件信息</button>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+                    <div class="px-6 py-4 bg-law-navy text-white flex justify-between items-center">
+                        <h2 class="law-title text-2xl font-bold" id="detail-case-name">案件名称</h2>
+                        <span id="detail-case-status" class="px-3 py-1 rounded-full text-sm font-medium bg-white/20">状态</span>
+                    </div>
+                    <div class="p-6 grid grid-cols-2 md:grid-cols-4 gap-6 bg-gray-50 border-b border-gray-100">
+                        <div><p class="text-sm text-gray-500 mb-1">案件号</p><p class="font-medium text-gray-800" id="detail-case-id">-</p></div>
+                        <div><p class="text-sm text-gray-500 mb-1">客户名称</p><p class="font-medium text-gray-800" id="detail-case-client">-</p></div>
+                        <div><p class="text-sm text-gray-500 mb-1" id="detail-date-label">任务DL</p><p class="font-medium text-gray-800" id="detail-case-date">-</p></div>
+                    </div>
+                    
+                    <div class="p-6">
+                        <h3 class="font-bold text-lg text-gray-800 mb-4"><i class="fa-solid fa-pen-to-square mr-2 text-law-gold"></i>更新案件记录</h3>
+                        <div class="flex flex-col space-y-3">
+                            <textarea id="case-log-input" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-law-gold outline-none" placeholder="输入最新的案件进展..."></textarea>
+                            <div class="flex justify-end space-x-3">
+                                <button id="submit-log-btn" onclick="addCaseLog()" class="bg-law-navy hover:bg-gray-800 text-white px-6 py-2 rounded-lg shadow transition-colors">提交记录</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                    <h3 class="font-bold text-lg text-gray-800 mb-6"><i class="fa-solid fa-clock-rotate-left mr-2 text-law-gold"></i>案件动态时间轴</h3>
+                    <div class="relative border-l-2 border-gray-200 ml-3 space-y-8" id="case-logs-container"></div>
+                </div>
+            </div>
+
+            <!-- 4. 已完成任务视图 -->
+            <div id="view-completed" class="view-section hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="law-title text-3xl font-bold text-law-navy">已完成任务</h2>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-0" id="completed-task-container"></div>
+                </div>
+            </div>
+
+            <!-- 5. 个人中心 -->
+            <div id="view-profile" class="view-section hidden">
+                <h2 class="law-title text-3xl font-bold text-law-navy mb-6">个人中心</h2>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 max-w-lg">
+                    <div class="space-y-4">
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">当前账号</label><input type="text" id="profile-account" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50" disabled></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">显示用户名</label><input type="text" id="profile-username" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-law-gold"></div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">新密码</label>
+                            <div class="relative">
+                                <input type="password" id="profile-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-law-gold pr-10" placeholder="留空则不修改">
+                                <button type="button" onclick="togglePasswordVisibility('profile-password', 'eye-icon-1')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
+                                    <i id="eye-icon-1" class="fa-solid fa-eye-slash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">确认新密码</label>
+                            <div class="relative">
+                                <input type="password" id="profile-password-confirm" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-law-gold pr-10" placeholder="请再次输入新密码">
+                                <button type="button" onclick="togglePasswordVisibility('profile-password-confirm', 'eye-icon-2')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
+                                    <i id="eye-icon-2" class="fa-solid fa-eye-slash"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button onclick="updateProfile()" class="w-full bg-law-navy text-white px-4 py-2 rounded-lg shadow mt-4 hover:bg-gray-800 transition-colors">保存修改</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. 用户管理 (Admin) -->
+            <div id="view-users" class="view-section hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="law-title text-3xl font-bold text-law-navy">用户管理</h2>
+                    <button onclick="openModal('modal-user')" class="bg-law-gold hover:bg-yellow-600 text-white px-4 py-2 rounded-lg shadow flex items-center"><i class="fa-solid fa-plus mr-2"></i> 添加子账户</button>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead><tr class="bg-gray-50 text-gray-600 text-sm uppercase border-b"><th class="px-6 py-4">账号</th><th class="px-6 py-4">用户名</th><th class="px-6 py-4">角色</th><th class="px-6 py-4 text-right">操作</th></tr></thead>
+                        <tbody id="users-list-body" class="divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 弹窗：二次确认 -->
+    <div id="modal-confirm" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] hidden flex items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm mx-4 transform scale-95 transition-transform duration-300" id="modal-confirm-content">
+            <div class="p-6 text-center">
+                <div class="w-16 h-16 rounded-full bg-red-100 text-red-500 flex items-center justify-center mx-auto mb-4 text-3xl"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <h3 class="font-bold text-xl text-gray-800 mb-2" id="confirm-title">确认</h3>
+                <p class="text-gray-500 text-sm mb-6" id="confirm-message">确定执行此操作吗？</p>
+                <div class="flex space-x-3 justify-center">
+                    <button onclick="closeModal('modal-confirm')" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg">取消</button>
+                    <button id="confirm-action-btn" class="px-6 py-2 bg-red-500 text-white rounded-lg">确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 弹窗：添加任务 -->
+    <div id="modal-task" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 transform scale-95 transition-transform duration-300" id="modal-task-content">
+            <div class="px-6 py-4 border-b bg-law-navy text-white rounded-t-xl flex justify-between"><h3 class="font-bold">添加任务</h3><button onclick="closeModal('modal-task')"><i class="fa-solid fa-times"></i></button></div>
+            <div class="p-6 space-y-4">
+                <div><label class="block text-sm mb-1">任务标题 *</label><input type="text" id="task-title" class="w-full px-4 py-2 border rounded-lg outline-none"></div>
+                <div><label class="block text-sm mb-1">日期时间</label><input type="datetime-local" id="task-datetime" class="w-full px-4 py-2 border rounded-lg outline-none"></div>
+            </div>
+            <div class="px-6 py-4 border-t flex justify-end space-x-3 bg-gray-50 rounded-b-xl">
+                <button onclick="closeModal('modal-task')" class="px-4 py-2 border rounded-lg">取消</button>
+                <button onclick="saveTask()" class="px-4 py-2 bg-law-gold text-white rounded-lg">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 弹窗：添加/修改案件 -->
+    <div id="modal-case" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-4 transform scale-95 transition-transform duration-300" id="modal-case-content">
+            <div class="px-6 py-4 border-b bg-law-navy text-white rounded-t-xl flex justify-between"><h3 class="font-bold" id="modal-case-title">添加案件</h3><button onclick="closeModal('modal-case')"><i class="fa-solid fa-times"></i></button></div>
+            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input type="hidden" id="case-form-mode" value="add">
+                <div><label class="block text-sm mb-1">案件号 *</label><input type="text" id="case-id" class="w-full px-4 py-2 border rounded-lg outline-none"></div>
+                <div><label class="block text-sm mb-1">案件名称 *</label><input type="text" id="case-name" class="w-full px-4 py-2 border rounded-lg outline-none"></div>
+                <div><label class="block text-sm mb-1">客户名称 *</label><input type="text" id="case-client" class="w-full px-4 py-2 border rounded-lg outline-none"></div>
+                <div><label class="block text-sm mb-1">当前状态</label>
+                    <select id="case-status" class="w-full px-4 py-2 border rounded-lg outline-none bg-white" onchange="toggleCaseDateInput()">
+                        <option value="进行中">进行中</option>
+                        <option value="已结案">已结案</option>
+                    </select>
+                </div>
+                <div id="div-task-dl"><label class="block text-sm mb-1">任务DL (截止日期)</label><input type="date" id="case-task-dl" class="w-full px-4 py-2 border rounded-lg outline-none"></div>
+                <div id="div-close-date" class="hidden"><label class="block text-sm mb-1">结案时间</label><input type="date" id="case-close-date" class="w-full px-4 py-2 border rounded-lg outline-none"></div>
+            </div>
+            <div class="px-6 py-4 border-t flex justify-end space-x-3 bg-gray-50 rounded-b-xl">
+                <button onclick="closeModal('modal-case')" class="px-4 py-2 border rounded-lg">取消</button>
+                <button onclick="saveCase()" class="px-4 py-2 bg-law-navy text-white rounded-lg">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 弹窗：添加用户 -->
+    <div id="modal-user" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 transform scale-95 transition-transform duration-300" id="modal-user-content">
+            <div class="px-6 py-4 border-b bg-law-navy text-white rounded-t-xl flex justify-between"><h3 class="font-bold">添加子账户</h3><button onclick="closeModal('modal-user')"><i class="fa-solid fa-times"></i></button></div>
+            <div class="p-6 space-y-4">
+                <div><label class="block text-sm mb-1">登录账号 *</label><input type="text" id="new-user-account" class="w-full px-4 py-2 border rounded-lg outline-none"></div>
+                <div><label class="block text-sm mb-1">显示用户名 *</label><input type="text" id="new-user-name" class="w-full px-4 py-2 border rounded-lg outline-none"></div>
+                <div><label class="block text-sm mb-1">初始密码 *</label><input type="password" id="new-user-pwd" class="w-full px-4 py-2 border rounded-lg outline-none" value="123456"></div>
+            </div>
+            <div class="px-6 py-4 border-t flex justify-end space-x-3 bg-gray-50 rounded-b-xl">
+                <button onclick="closeModal('modal-user')" class="px-4 py-2 border rounded-lg">取消</button>
+                <button onclick="saveUser()" class="px-4 py-2 bg-law-navy text-white rounded-lg">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 数据模型与持久化 ---
+        const defaultUsers = [
+            { account: 'admin', username: '管理员(Admin)', password: 'admin123', role: 'admin' },
+            { account: 'user1', username: '律师A', password: '123', role: 'user' }
+        ];
+        
+        let users = [];
+        let currentUser = null;
+
+        // 尝试从 localStorage 加载用户数据
+        try {
+            const storedUsers = localStorage.getItem('ray_law_users');
+            if (storedUsers) {
+                users = JSON.parse(storedUsers);
+            } else {
+                users = defaultUsers;
+                localStorage.setItem('ray_law_users', JSON.stringify(users));
+            }
+        } catch(e) {
+            console.warn("无法访问 localStorage，将使用默认数据。");
+            users = defaultUsers;
+        }
+
+        // 保存用户数据到 localStorage
+        function saveUsersToStorage() {
+            try {
+                localStorage.setItem('ray_law_users', JSON.stringify(users));
+            } catch(e) {
+                console.warn("无法保存到 localStorage。");
+            }
+        }
+
+        let cases = [
+            { id: '2026-MC-001', name: '某科技公司股权纠纷案', client: '王先生', status: '进行中', taskDL: '2026-04-15', closeDate: '', logs: [
+                { id: 101, time: '2026-03-20 10:00', author: '管理员(Admin)', content: '正式接受委托，签署代理合同。' }
+            ] },
+            { id: '2025-MC-088', name: '张三劳动仲裁案', client: '张三', status: '已结案', taskDL: '', closeDate: '2025-12-10', logs: [] }
+        ];
+
+        let activeTasks = [
+            { id: 1, title: '起草起诉状', datetime: '2026-03-24T10:00' },
+            { id: 2, title: '法院递交材料', datetime: '2026-03-26T14:30' }
+        ];
+
+        let completedTasks = [
+            { id: 3, title: '初次客户面谈', completedAt: '2026-03-19 15:30:00' }
+        ];
+        
+        let currentViewCaseId = null;
+        let currentCaseTab = 'ongoing'; 
+
+        // --- 拖拽排序相关变量 ---
+        let dragSrcEl = null;
+        let dragType = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('confirm-action-btn').addEventListener('click', () => {
+                if(confirmActionCallback) confirmActionCallback();
+                closeModal('modal-confirm');
+            });
+        });
+
+        // --- 登录与用户系统 ---
+        function handleLoginKeyPress(e) { if (e.key === 'Enter') login(); }
+        function login() {
+            const acc = document.getElementById('username-input').value;
+            const pwd = document.getElementById('password-input').value;
+            const user = users.find(u => u.account === acc && u.password === pwd);
+            
+            if (user) {
+                currentUser = user;
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('app-screen').classList.remove('hidden');
+                document.getElementById('current-user-display').textContent = user.username;
+                
+                // 权限控制
+                if(user.role === 'admin') {
+                    document.getElementById('nav-users').classList.remove('hidden');
+                } else {
+                    document.getElementById('nav-users').classList.add('hidden');
+                }
+                
+                switchTab('dashboard');
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        }
+        function logout() { location.reload(); }
+
+        // --- 导航 ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(btn => { btn.classList.remove('bg-law-gold/20', 'text-law-gold'); btn.classList.add('text-gray-300'); });
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            if(activeBtn) { activeBtn.classList.remove('text-gray-300'); activeBtn.classList.add('bg-law-gold/20', 'text-law-gold'); }
+            
+            if(tabId === 'dashboard') renderTasks();
+            if(tabId === 'cases') renderCases();
+            if(tabId === 'completed') renderCompletedTasks();
+            if(tabId === 'profile') loadProfile();
+            if(tabId === 'users' && currentUser.role === 'admin') renderUsers();
+        }
+
+        // --- 模态框基础 ---
+        function openModal(id) { const m = document.getElementById(id), c = document.getElementById(`${id}-content`); m.classList.remove('hidden'); void m.offsetWidth; m.classList.remove('opacity-0'); c.classList.remove('scale-95'); }
+        function closeModal(id) { const m = document.getElementById(id), c = document.getElementById(`${id}-content`); m.classList.add('opacity-0'); c.classList.add('scale-95'); setTimeout(() => m.classList.add('hidden'), 300); }
+        
+        let confirmActionCallback = null;
+        function openConfirmModal(title, message, callback) {
+            document.getElementById('confirm-title').textContent = title;
+            document.getElementById('confirm-message').textContent = message;
+            confirmActionCallback = callback;
+            openModal('modal-confirm');
+        }
+
+        // --- 个人中心 & 用户管理 ---
+        function loadProfile() {
+            document.getElementById('profile-account').value = currentUser.account;
+            document.getElementById('profile-username').value = currentUser.username;
+            document.getElementById('profile-password').value = '';
+            document.getElementById('profile-password-confirm').value = '';
+        }
+
+        function togglePasswordVisibility(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            }
+        }
+
+        function updateProfile() {
+            const newName = document.getElementById('profile-username').value;
+            const newPwd = document.getElementById('profile-password').value;
+            const confirmPwd = document.getElementById('profile-password-confirm').value;
+
+            if(!newName) return alert('用户名不能为空');
+            
+            if(newPwd) {
+                if(newPwd !== confirmPwd) return alert('两次输入的密码不一致！');
+                currentUser.password = newPwd;
+            }
+            currentUser.username = newName;
+
+            // 更新全局 users 数组并保存
+            const userIndex = users.findIndex(u => u.account === currentUser.account);
+            if(userIndex !== -1) {
+                users[userIndex] = currentUser;
+                saveUsersToStorage();
+            }
+
+            document.getElementById('current-user-display').textContent = currentUser.username;
+            document.getElementById('profile-password').value = '';
+            document.getElementById('profile-password-confirm').value = '';
+            alert('个人信息修改成功！下次登录请使用新信息。');
+        }
+
+        function renderUsers() {
+            const tbody = document.getElementById('users-list-body'); tbody.innerHTML = '';
+            users.forEach(u => {
+                const isSelf = u.account === currentUser.account;
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="px-6 py-4">${u.account}</td>
+                        <td class="px-6 py-4">${u.username}</td>
+                        <td class="px-6 py-4">${u.role === 'admin' ? '管理员' : '普通用户'}</td>
+                        <td class="px-6 py-4 text-right">
+                            ${!isSelf ? `<button onclick="deleteUser('${u.account}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i> 删除</button>` : '<span class="text-gray-400">当前账号</span>'}
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        function saveUser() {
+            const acc = document.getElementById('new-user-account').value;
+            const name = document.getElementById('new-user-name').value;
+            const pwd = document.getElementById('new-user-pwd').value;
+            if(!acc || !name || !pwd) return alert('请填写完整');
+            if(users.find(u => u.account === acc)) return alert('账号已存在');
+            
+            users.push({ account: acc, username: name, password: pwd, role: 'user' });
+            saveUsersToStorage();
+            renderUsers(); 
+            closeModal('modal-user');
+        }
+
+        function deleteUser(acc) {
+            openConfirmModal('删除用户', `确定要删除账户 ${acc} 吗？`, () => {
+                users = users.filter(u => u.account !== acc); 
+                saveUsersToStorage();
+                renderUsers();
+            });
+        }
+
+        // --- 拖拽排序核心逻辑 ---
+        function handleDragStart(e, type, index) {
+            dragSrcEl = e.target.closest('tr') || e.target.closest('.draggable-item');
+            dragSrcEl.classList.add('dragging');
+            dragType = type;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', index);
+        }
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            const target = e.target.closest('tr') || e.target.closest('.draggable-item');
+            if(target && target !== dragSrcEl) target.classList.add('drag-over');
+            return false;
+        }
+        function handleDragLeave(e) {
+            const target = e.target.closest('tr') || e.target.closest('.draggable-item');
+            if(target) target.classList.remove('drag-over');
+        }
+        function handleDrop(e, type, targetIndex) {
+            e.stopPropagation();
+            const target = e.target.closest('tr') || e.target.closest('.draggable-item');
+            if(target) target.classList.remove('drag-over');
+            if(dragSrcEl) dragSrcEl.classList.remove('dragging');
+            
+            if(dragType !== type) return false;
+            
+            const sourceIndex = parseInt(e.dataTransfer.getData('text/plain'), 10);
+            if(sourceIndex === targetIndex) return false;
+
+            if(type === 'task') {
+                const item = activeTasks.splice(sourceIndex, 1)[0];
+                activeTasks.splice(targetIndex, 0, item);
+                renderTasks();
+            } else if(type === 'case') {
+                const filteredCases = getFilteredCases();
+                const sourceCase = filteredCases[sourceIndex];
+                const targetCase = filteredCases[targetIndex];
+                
+                const realSourceIdx = cases.findIndex(c => c.id === sourceCase.id);
+                const realTargetIdx = cases.findIndex(c => c.id === targetCase.id);
+                
+                const item = cases.splice(realSourceIdx, 1)[0];
+                cases.splice(realTargetIdx, 0, item);
+                renderCases();
+            }
+            return false;
+        }
+
+        // --- 待办任务 ---
+        function openTaskModal() { document.getElementById('task-title').value = ''; document.getElementById('task-datetime').value = new Date().toISOString().slice(0,16); openModal('modal-task'); }
+        function saveTask() {
+            const title = document.getElementById('task-title').value, datetime = document.getElementById('task-datetime').value;
+            if (!title) return alert('请填写必填项');
+            activeTasks.push({ id: Date.now(), title, datetime });
+            renderTasks(); closeModal('modal-task');
+        }
+        function completeTask(taskId) {
+            const index = activeTasks.findIndex(t => t.id === taskId);
+            if(index > -1) {
+                const task = activeTasks.splice(index, 1)[0]; 
+                task.completedAt = new Date().toLocaleString('zh-CN');
+                completedTasks.push(task); renderTasks(); renderCompletedTasks();
+            }
+        }
+        function promptDeleteTask(taskId) {
+            openConfirmModal('删除待办任务', '确定要删除这个待办任务吗？', () => {
+                activeTasks = activeTasks.filter(t => t.id !== taskId); renderTasks();
+            });
+        }
+        function renderTasks() {
+            const container = document.getElementById('task-list-container'); container.innerHTML = '';
+            if (activeTasks.length === 0) { container.innerHTML = '<div class="p-8 text-center text-gray-400">暂无待办任务</div>'; return; }
+            
+            activeTasks.forEach((t, idx) => {
+                const d = new Date(t.datetime);
+                const deleteBtn = currentUser.role === 'admin' ? `<button onclick="promptDeleteTask(${t.id})" class="text-gray-300 hover:text-red-500 transition-colors" title="删除任务"><i class="fa-regular fa-trash-can text-xl"></i></button>` : '';
+                
+                container.innerHTML += `
+                    <div class="draggable-item px-6 py-4 border-b border-gray-100 hover:bg-gray-50 flex items-center justify-between cursor-move"
+                         draggable="true" 
+                         ondragstart="handleDragStart(event, 'task', ${idx})"
+                         ondragover="handleDragOver(event)"
+                         ondragleave="handleDragLeave(event)"
+                         ondrop="handleDrop(event, 'task', ${idx})">
+                        <div class="flex items-center">
+                            <i class="fa-solid fa-grip-vertical text-gray-300 mr-4"></i>
+                            <span class="text-sm font-bold text-law-navy mr-4">${d.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})}</span>
+                            <span class="font-semibold text-gray-800">${t.title}</span>
+                        </div>
+                        <div class="flex space-x-3">
+                            <button onclick="completeTask(${t.id})" class="text-gray-300 hover:text-green-500 transition-colors" title="标记完成"><i class="fa-regular fa-circle-check text-xl"></i></button>
+                            ${deleteBtn}
+                        </div>
+                    </div>`;
+            });
+        }
+
+        // --- 案件管理 ---
+        function toggleCaseDateInput() {
+            const status = document.getElementById('case-status').value;
+            if(status === '进行中') {
+                document.getElementById('div-task-dl').classList.remove('hidden');
+                document.getElementById('div-close-date').classList.add('hidden');
+            } else {
+                document.getElementById('div-task-dl').classList.add('hidden');
+                document.getElementById('div-close-date').classList.remove('hidden');
+            }
+        }
+
+        function openCaseModal() { 
+            document.getElementById('modal-case-title').textContent = '添加案件';
+            document.getElementById('case-form-mode').value = 'add';
+            document.getElementById('case-id').value = ''; document.getElementById('case-name').value = ''; document.getElementById('case-client').value = ''; 
+            document.getElementById('case-status').value = '进行中';
+            document.getElementById('case-task-dl').value = ''; document.getElementById('case-close-date').value = '';
+            toggleCaseDateInput();
+            openModal('modal-case'); 
+        }
+
+        function openEditCaseModal() {
+            const c = cases.find(x => x.id === currentViewCaseId);
+            if (!c) return;
+            document.getElementById('modal-case-title').textContent = '修改案件信息';
+            document.getElementById('case-form-mode').value = 'edit';
+            document.getElementById('case-id').value = c.id;
+            document.getElementById('case-name').value = c.name;
+            document.getElementById('case-client').value = c.client;
+            document.getElementById('case-status').value = c.status;
+            document.getElementById('case-task-dl').value = c.taskDL || '';
+            document.getElementById('case-close-date').value = c.closeDate || '';
+            toggleCaseDateInput();
+            openModal('modal-case');
+        }
+
+        function saveCase() {
+            const mode = document.getElementById('case-form-mode').value;
+            const id = document.getElementById('case-id').value, name = document.getElementById('case-name').value, client = document.getElementById('case-client').value, status = document.getElementById('case-status').value;
+            const taskDL = document.getElementById('case-task-dl').value, closeDate = document.getElementById('case-close-date').value;
+            
+            if (!id || !name) return alert('请填写必填项');
+            
+            if(mode === 'add') {
+                cases.push({ id, name, client, status, taskDL, closeDate, logs: [] });
+            } else {
+                const c = cases.find(x => x.id === currentViewCaseId);
+                if(c) {
+                    c.id = id; c.name = name; c.client = client; c.status = status; c.taskDL = taskDL; c.closeDate = closeDate;
+                    currentViewCaseId = c.id;
+                    openCaseDetail(c.id);
+                }
+            }
+            renderCases(); closeModal('modal-case');
+        }
+
+        function promptDeleteCase() {
+            const c = cases.find(x => x.id === currentViewCaseId);
+            if(!c) return;
+            openConfirmModal('删除案件', `确定要彻底删除案件 [${c.id}] 吗？`, () => {
+                cases = cases.filter(x => x.id !== currentViewCaseId);
+                switchTab('cases'); renderCases();
+            });
+        }
+
+        function setCaseTab(tab) {
+            currentCaseTab = tab;
+            const btnOngoing = document.getElementById('tab-ongoing');
+            const btnCompleted = document.getElementById('tab-completed');
+            
+            if(tab === 'ongoing') {
+                btnOngoing.className = "px-4 py-2 text-sm font-medium rounded-md bg-white shadow-sm text-law-navy transition-all";
+                btnCompleted.className = "px-4 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 transition-all";
+                document.getElementById('case-status-header').textContent = '任务DL';
+            } else {
+                btnCompleted.className = "px-4 py-2 text-sm font-medium rounded-md bg-white shadow-sm text-law-navy transition-all";
+                btnOngoing.className = "px-4 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 transition-all";
+                document.getElementById('case-status-header').textContent = '结案时间';
+            }
+            renderCases();
+        }
+
+        function getFilteredCases() {
+            return cases.filter(c => {
+                let isCompleted = (c.status === '已结案');
+                if(currentCaseTab === 'ongoing' && isCompleted) return false;
+                if(currentCaseTab === 'completed' && !isCompleted) return false;
+                return true;
+            });
+        }
+
+        function renderCases() {
+            const tbody = document.getElementById('case-list-body'); tbody.innerHTML = '';
+            const filteredCases = getFilteredCases();
+
+            if (filteredCases.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-gray-400">没有找到符合条件的案件</td></tr>`;
+                return;
+            }
+
+            filteredCases.forEach((c, idx) => {
+                const latestLog = c.logs.length > 0 ? c.logs[0].content : '暂无动态记录';
+                const dateDisplay = currentCaseTab === 'ongoing' ? (c.taskDL || '-') : (c.closeDate || '-');
+                const badgeColor = currentCaseTab === 'ongoing' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700';
+                
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50 transition-colors cursor-move group"
+                        draggable="true" 
+                        ondragstart="handleDragStart(event, 'case', ${idx})"
+                        ondragover="handleDragOver(event)"
+                        ondragleave="handleDragLeave(event)"
+                        ondrop="handleDrop(event, 'case', ${idx})">
+                        <td class="px-6 py-4 text-gray-300 align-top"><i class="fa-solid fa-grip-vertical"></i></td>
+                        <td class="px-6 py-4 font-medium text-law-navy align-top" onclick="openCaseDetail('${c.id}')">${c.id}</td>
+                        <td class="px-6 py-4 align-top" onclick="openCaseDetail('${c.id}')">
+                            <div class="text-gray-800 font-medium">${c.name}</div>
+                            <div class="text-xs text-gray-500 mt-1 line-clamp-2"><span class="text-law-gold mr-1"><i class="fa-solid fa-clock-rotate-left"></i> 最新:</span>${latestLog}</div>
+                        </td>
+                        <td class="px-6 py-4 text-gray-600 align-top" onclick="openCaseDetail('${c.id}')">${c.client}</td>
+                        <td class="px-6 py-4 align-top" onclick="openCaseDetail('${c.id}')"><span class="px-2.5 py-1 text-xs font-medium rounded-full ${badgeColor}">${dateDisplay}</span></td>
+                        <td class="px-6 py-4 text-right text-law-gold align-top" onclick="openCaseDetail('${c.id}')"><i class="fa-solid fa-chevron-right mt-1"></i></td>
+                    </tr>`;
+            });
+        }
+
+        // --- 案件动态逻辑 ---
+        function openCaseDetail(caseId) {
+            const c = cases.find(x => x.id === caseId); if(!c) return;
+            currentViewCaseId = caseId;
+            document.getElementById('detail-case-name').textContent = c.name;
+            document.getElementById('detail-case-id').textContent = c.id;
+            document.getElementById('detail-case-client').textContent = c.client;
+            
+            if(c.status === '进行中') {
+                document.getElementById('detail-date-label').textContent = '任务DL';
+                document.getElementById('detail-case-date').textContent = c.taskDL || '-';
+            } else {
+                document.getElementById('detail-date-label').textContent = '结案时间';
+                document.getElementById('detail-case-date').textContent = c.closeDate || '-';
+            }
+            
+            document.getElementById('detail-case-status').textContent = c.status;
+            
+            const btnDelete = document.getElementById('btn-delete-case');
+            if(currentUser.role === 'admin') btnDelete.classList.remove('hidden');
+            else btnDelete.classList.add('hidden');
+            
+            renderCaseLogs(); switchTab('case-detail');
+        }
+
+        function addCaseLog() {
+            const content = document.getElementById('case-log-input').value.trim();
+            if(!content) return;
+            const c = cases.find(x => x.id === currentViewCaseId);
+            const timeStr = new Date().toLocaleString('zh-CN');
+            c.logs.unshift({ id: Date.now(), time: timeStr, author: currentUser.username, content: content });
+            document.getElementById('case-log-input').value = '';
+            renderCaseLogs(); renderCases();
+        }
+
+        function deleteCaseLog(logId) {
+            const c = cases.find(x => x.id === currentViewCaseId);
+            c.logs = c.logs.filter(l => l.id !== logId);
+            renderCaseLogs(); renderCases();
+        }
+
+        function renderCaseLogs() {
+            const c = cases.find(x => x.id === currentViewCaseId);
+            const container = document.getElementById('case-logs-container'); container.innerHTML = '';
+            if(c.logs.length === 0) { container.innerHTML = '<p class="text-gray-400 text-sm ml-6">暂无案件动态记录。</p>'; return; }
+
+            c.logs.forEach(log => {
+                const deleteBtn = currentUser.role === 'admin' ? `<button onclick="deleteCaseLog(${log.id})" class="text-red-500 hover:text-red-700 text-xs"><i class="fa-solid fa-trash"></i> 删除</button>` : '';
+                container.innerHTML += `
+                    <div class="relative pl-6 group">
+                        <div class="absolute w-3 h-3 bg-law-gold rounded-full -left-[7px] top-1.5 border-2 border-white"></div>
+                        <div class="flex justify-between items-center mb-1">
+                            <p class="text-xs text-gray-500 font-mono">${log.time} · 记录人: <span class="font-semibold text-law-navy">${log.author || '未知'}</span></p>
+                            <div class="opacity-0 group-hover:opacity-100 transition-opacity space-x-2">${deleteBtn}</div>
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded-lg border border-gray-100 text-gray-700 text-sm whitespace-pre-wrap">${log.content}</div>
+                    </div>`;
+            });
+        }
+
+        // --- 已完成任务 ---
+        function promptDeleteCompletedTask(taskId) {
+            openConfirmModal('删除已完成任务', '确定要永久删除这条已完成记录吗？', () => {
+                completedTasks = completedTasks.filter(t => t.id !== taskId); renderCompletedTasks();
+            });
+        }
+        function renderCompletedTasks() {
+            const container = document.getElementById('completed-task-container'); container.innerHTML = '';
+            if (completedTasks.length === 0) { container.innerHTML = '<div class="p-8 text-center text-gray-400">暂无已完成任务</div>'; return; }
+            
+            [...completedTasks].reverse().forEach(t => {
+                const deleteBtn = currentUser.role === 'admin' ? `<button onclick="promptDeleteCompletedTask(${t.id})" class="text-gray-400 hover:text-red-500 transition-colors p-2" title="彻底删除"><i class="fa-solid fa-trash"></i></button>` : '';
+                container.innerHTML += `
+                    <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                        <div class="flex flex-col">
+                            <div class="flex items-center text-gray-500 line-through"><i class="fa-solid fa-check text-green-500 mr-3"></i><span class="font-semibold">${t.title}</span></div>
+                            <div class="text-xs text-gray-400 mt-1 ml-7">完成时间: ${t.completedAt}</div>
+                        </div>
+                        ${deleteBtn}
+                    </div>`;
+            });
+        }
+    </script>
+</body>
+</html>
