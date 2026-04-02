@@ -49,14 +49,16 @@ jobs:
         with:
           context: ./api
           
-          - name: Debug workspace
-  run: |
-    pwd
-    ls -la
-    ls -la api || true
-    find. -maxdepth 3 -type f | sed -n '1,200p'
+
           file: ./api/Dockerfile
           push: true
           tags: |
             ghcr.io/raylawlu/ray-lawyer-api:0.1.0
             ghcr.io/raylawlu/ray-lawyer-api:latest
+
+        - name: Debug workspace
+  run: |
+    pwd
+    ls -la
+    ls -la api || true
+    find. -maxdepth 3 -type f | sed -n '1,200p'
