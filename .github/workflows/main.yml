@@ -48,7 +48,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./backend/api
-          file: ./api/Dockerfile
+          file: ./backend/api/Dockerfile
           push: true
           tags: |
             ghcr.io/raylawlu/ray-lawyer-api:0.1.0
