@@ -48,13 +48,13 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./api
-
+          
           - name: Debug workspace
   run: |
     pwd
     ls -la
     ls -la api || true
-    find . -maxdepth 3 -type f | sed -n '1,200p'
+    find. -maxdepth 3 -type f | sed -n '1,200p'
           file: ./api/Dockerfile
           push: true
           tags: |
