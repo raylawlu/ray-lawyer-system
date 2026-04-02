@@ -3,1178 +3,967 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ray律师案件管理系统 - 终极版</title>
+    <title>Ray律师案件管理系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { law: { navy: '#0f172a', gold: '#d4af37', light: '#f8fafc', gray: '#64748b' } },
+                    fontFamily: { serif: ['"Noto Serif SC"', 'serif'], sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%), 
-                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><defs><linearGradient id="bg1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ffffff;stop-opacity:0.1" /><stop offset="100%" style="stop-color:%23ffffff;stop-opacity:0.05" /></linearGradient></defs><rect width="1200" height="800" fill="url(%23bg1)"/><rect x="100" y="200" width="80" height="400" fill="rgba(255,255,255,0.1)" rx="5"/><rect x="200" y="150" width="100" height="450" fill="rgba(255,255,255,0.08)" rx="5"/><rect x="320" y="180" width="90" height="420" fill="rgba(255,255,255,0.06)" rx="5"/><rect x="430" y="120" width="110" height="480" fill="rgba(255,255,255,0.07)" rx="5"/><rect x="560" y="160" width="85" height="440" fill="rgba(255,255,255,0.09)" rx="5"/><rect x="670" y="190" width="95" height="410" fill="rgba(255,255,255,0.05)" rx="5"/><rect x="790" y="140" width="105" height="460" fill="rgba(255,255,255,0.08)" rx="5"/><rect x="920" y="170" width="88" height="430" fill="rgba(255,255,255,0.06)" rx="5"/><circle cx="150" cy="100" r="3" fill="rgba(255,255,255,0.4)"/><circle cx="300" cy="80" r="2" fill="rgba(255,255,255,0.4)"/><circle cx="500" cy="60" r="4" fill="rgba(255,255,255,0.4)"/><circle cx="750" cy="90" r="3" fill="rgba(255,255,255,0.4)"/><circle cx="950" cy="70" r="2" fill="rgba(255,255,255,0.4)"/></svg>');
-            background-size: cover;
-            background-attachment: fixed;
-            color: #2c3e50; 
-            min-height: 100vh; 
-            position: relative;
-        }
-        .header { 
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            color: #2c3e50; 
-            padding: 35px 50px; 
-            text-align: center; 
-            position: relative; 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-            border-bottom: 1px solid rgba(255,255,255,0.3);
-        }
-        .header h1 { 
-            font-size: 36px; 
-            font-weight: 300; 
-            margin-bottom: 10px; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .header p { 
-            font-size: 18px; 
-            opacity: 0.8; 
-            font-weight: 300;
-            color: #718096;
-        }
-        .container { 
-            max-width: 1500px; 
-            margin: 0 auto; 
-            padding: 50px 40px; 
-            display: flex; 
-            gap: 40px; 
-        }
-        .sidebar { 
-            width: 420px; 
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(20px);
-            border-radius: 25px; 
-            padding: 35px; 
-            height: fit-content; 
-            box-shadow: 0 25px 70px rgba(0,0,0,0.1); 
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        .main-content { 
-            flex: 1; 
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(20px);
-            border-radius: 25px; 
-            padding: 50px; 
-            box-shadow: 0 25px 70px rgba(0,0,0,0.1); 
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        .case-form { 
-            background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
-            padding: 35px; 
-            border-radius: 20px; 
-            margin-bottom: 35px; 
-            border: 1px solid rgba(226, 232, 240, 0.8); 
-            position: relative;
-            overflow: hidden;
-        }
-        .case-form::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 6px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .form-group { 
-            margin-bottom: 30px; 
-        }
-        label { 
-            display: block; 
-            margin-bottom: 12px; 
-            font-weight: 700; 
-            color: #2d3748; 
-            font-size: 15px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        input, select, textarea { 
-            width: 100%; 
-            padding: 18px 22px; 
-            border: 2px solid #e2e8f0; 
-            border-radius: 15px; 
-            font-size: 16px; 
-            transition: all 0.4s ease; 
-            background: white;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-        }
-        input:focus, select:focus, textarea:focus {
-            outline: none; 
-            border-color: #667eea; 
-            box-shadow: 0 0 0 6px rgba(102, 126, 234, 0.15);
-            transform: translateY(-2px);
-        }
-        button { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-            color: white; 
-            padding: 18px 35px; 
-            border: none; 
-            border-radius: 15px; 
-            cursor: pointer; 
-            margin-right: 20px; 
-            font-size: 16px; 
-            font-weight: 700; 
-            transition: all 0.4s ease; 
-            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        button:hover { 
-            transform: translateY(-4px); 
-            box-shadow: 0 18px 45px rgba(102, 126, 234, 0.5); 
-        }
-        .btn-secondary { 
-            background: linear-gradient(135deg, #718096 0%, #4a5568 100%); 
-            box-shadow: 0 12px 35px rgba(113, 128, 150, 0.4);
-        }
-        .btn-secondary:hover { 
-            box-shadow: 0 18px 45px rgba(113, 128, 150, 0.5); 
-        }
-        .btn-success { 
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); 
-            box-shadow: 0 12px 35px rgba(72, 187, 120, 0.4);
-        }
-        .btn-success:hover { 
-            box-shadow: 0 18px 45px rgba(72, 187, 120, 0.5); 
-        }
-        .cases-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); 
-            gap: 35px; 
-        }
-        .case-card { 
-            background: white; 
-            border-radius: 22px; 
-            padding: 35px; 
-            box-shadow: 0 15px 50px rgba(0,0,0,0.1); 
-            cursor: pointer; 
-            transition: all 0.5s ease; 
-            border: 1px solid rgba(226, 232, 240, 0.8); 
-            position: relative;
-            overflow: hidden;
-        }
-        .case-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 6px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .case-card:hover { 
-            transform: translateY(-10px); 
-            box-shadow: 0 25px 70px rgba(0,0,0,0.2); 
-        }
-        .case-header { 
-            border-bottom: 1px solid #e2e8f0; 
-            padding-bottom: 25px; 
-            margin-bottom: 25px; 
-        }
-        .case-number { 
-            font-size: 20px; 
-            font-weight: 800; 
-            color: #2d3748; 
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .case-name { 
-            color: #718096; 
-            font-size: 18px; 
-            line-height: 1.6;
-            font-weight: 600;
-        }
-        .case-status { 
-            display: inline-block; 
-            padding: 10px 20px; 
-            border-radius: 30px; 
-            font-size: 13px; 
-            margin-top: 20px; 
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-        }
-        .status-active { 
-            background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%); 
-            color: #22543d; 
-        }
-        .status-pending { 
-            background: linear-gradient(135deg, #fed7aa 0%, #fbb360 100%); 
-            color: #c05621; 
-        }
-        .status-closed { 
-            background: linear-gradient(135deg, #fed7d7 0%, #fc8181 100%); 
-            color: #c53030; 
-        }
-        .status-paused { 
-            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%); 
-            color: #4a5568; 
-        }
-        .status-archived { 
-            background: linear-gradient(135deg, #bee3f8 0%, #90cdf4 100%); 
-            color: #2c5282; 
-        }
-        .case-meta { 
-            font-size: 15px; 
-            color: #718096; 
-            margin: 12px 0; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 10px;
-        }
-        .case-meta div { 
-            display: flex; 
-            align-items: center;
-            font-weight: 600;
-        }
-        .case-meta strong { 
-            color: #4a5568; 
-            margin-right: 12px;
-            min-width: 60px;
-        }
-        .nav-tabs { 
-            display: flex; 
-            margin-bottom: 50px; 
-            border-bottom: 3px solid #e2e8f0; 
-            background: rgba(248, 250, 252, 0.8);
-            border-radius: 20px; 
-            padding: 10px;
-            backdrop-filter: blur(10px);
-        }
-        .nav-tab { 
-            padding: 18px 35px; 
-            cursor: pointer; 
-            border-bottom: 4px solid transparent; 
-            color: #718096; 
-            font-weight: 700; 
-            border-radius: 15px; 
-            margin: 0 6px; 
-            transition: all 0.4s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 14px;
-        }
-        .nav-tab:hover { 
-            background: rgba(102, 126, 234, 0.15); 
-            color: #667eea; 
-            transform: translateY(-2px);
-        }
-        .nav-tab.active { 
-            color: #667eea; 
-            border-bottom-color: #667eea; 
-            background: white; 
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-        }
-        .tab-content { 
-            display: none;
-        }
-        .tab-content.active { 
-            display: block;
-        }
-        .login-container { 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%), 
-                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><defs><linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ffffff;stop-opacity:0.1" /><stop offset="100%" style="stop-color:%23ffffff;stop-opacity:0.05" /></linearGradient></defs><rect width="1200" height="800" fill="url(%23bg2)"/><rect x="50" y="100" width="120" height="300" fill="rgba(255,255,255,0.1)" rx="8"/><rect x="200" y="80" width="140" height="320" fill="rgba(255,255,255,0.08)" rx="8"/><rect x="370" y="120" width="110" height="280" fill="rgba(255,255,255,0.06)" rx="8"/><rect x="510" y="60" width="130" height="340" fill="rgba(255,255,255,0.07)" rx="8"/><rect x="680" y="90" width="125" height="310" fill="rgba(255,255,255,0.09)" rx="8"/><rect x="850" y="110" width="115" height="290" fill="rgba(255,255,255,0.05)" rx="8"/><rect x="1000" y="70" width="135" height="330" fill="rgba(255,255,255,0.08)" rx="8"/></svg>');
-            background-size: cover;
-            background-attachment: fixed;
-        }
-        .login-box { 
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(25px);
-            padding: 60px; 
-            border-radius: 30px; 
-            box-shadow: 0 40px 100px rgba(0,0,0,0.2); 
-            width: 100%; 
-            max-width: 520px; 
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.3);
-            position: relative;
-            overflow: hidden;
-        }
-        .login-box::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 8px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .login-title { 
-            margin-bottom: 50px; 
-            color: #2d3748; 
-            font-size: 32px; 
-            font-weight: 300;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .login-input { 
-            margin-bottom: 35px; 
-        }
-        .login-input label {
-            display: block;
-            text-align: left;
-            margin-bottom: 15px;
-            color: #4a5568;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 14px;
-        }
-        .login-btn { 
-            width: 100%; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-            color: white; 
-            padding: 22px; 
-            border: none; 
-            border-radius: 15px; 
-            font-size: 18px; 
-            font-weight: 700; 
-            cursor: pointer; 
-            margin-top: 20px;
-            box-shadow: 0 15px 45px rgba(102, 126, 234, 0.5);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-        }
-        .login-btn:hover { 
-            transform: translateY(-4px); 
-            box-shadow: 0 22px 60px rgba(102, 126, 234, 0.6); 
-        }
-        .error-msg { 
-            color: #e53e3e; 
-            text-align: center; 
-            margin-top: 25px; 
-            display: none; 
-            font-weight: 600;
-            font-size: 15px;
-        }
+        body { font-family: 'Inter', sans-serif; background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; background-attachment: fixed; }
+        .bg-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px); z-index: -1; }
+        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+        .law-title { font-family: 'Noto Serif SC', serif; }
+        .dragging { opacity: 0.5; background-color: #f8fafc; border: 2px dashed #d4af37; }
+        .drag-over { border-top: 2px solid #d4af37; }
         
-        /* 终极日历样式 */
-        .calendar-container { 
-            background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
-            border-radius: 22px; 
-            padding: 35px; 
-            margin-bottom: 35px; 
-            border: 1px solid rgba(226, 232, 240, 0.8); 
-            position: relative;
-            overflow: hidden;
-        }
-        .calendar-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 6px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .calendar-header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 35px; 
-        }
-        .calendar-nav { 
-            display: flex; 
-            gap: 20px; 
-            align-items: center; 
-        }
-        .calendar-nav h3 { 
-            margin: 0 25px; 
-            color: #2d3748; 
-            font-size: 28px; 
-            font-weight: 700;
-        }
-        .calendar-grid { 
-            display: grid; 
-            grid-template-columns: repeat(7, 1fr); 
-            gap: 4px; 
-            background: #e2e8f0; 
-            border: 3px solid #e2e8f0; 
-            border-radius: 20px; 
-            overflow: hidden;
-            padding: 4px;
-        }
-        .calendar-day-header { 
-            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%); 
-            color: white; 
-            padding: 22px 10px; 
-            text-align: center; 
-            font-weight: 800; 
-            font-size: 16px;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-        }
-        .calendar-day { 
-            background: white; 
-            min-height: 140px; 
-            padding: 15px; 
-            vertical-align: top; 
-            position: relative; 
-            cursor: pointer; 
-            transition: all 0.4s ease;
-            border-radius: 12px;
-            margin: 3px;
-        }
-        .calendar-day:hover { 
-            background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%); 
-            transform: scale(1.05);
-        }
-        .calendar-day.other-month { 
-            background: #f8fafc; 
-            color: #a0aec0; 
-        }
-        .calendar-day.today { 
-            background: linear-gradient(135deg, #e6fffa 0%, #b2f5ea 100%); 
-            border: 3px solid #38b2ac; 
-            font-weight: 800;
-            box-shadow: 0 8px 25px rgba(56, 178, 172, 0.4);
-        }
-        .calendar-day.selected { 
-            background: linear-gradient(135deg, #fef5e7 0%, #fbd38d 100%); 
-            border: 3px solid #ed8936; 
-            box-shadow: 0 8px 25px rgba(237, 137, 54, 0.4);
-        }
-        .day-number { 
-            font-weight: 800; 
-            margin-bottom: 12px; 
-            font-size: 18px; 
-            color: #2d3748;
-        }
-        .calendar-event { 
-            background: linear-gradient(135deg, #e6fffa 0%, #b2f5ea 100%); 
-            border-left: 5px solid #38b2ac; 
-            padding: 8px 12px; 
-            margin: 6px 0; 
-            border-radius: 8px; 
-            font-size: 13px; 
-            cursor: pointer; 
-            line-height: 1.5; 
-            color: #234e52;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
-        }
-        .calendar-event.case-related { 
-            background: linear-gradient(135deg, #f3e8ff 0%, #e9d8fd 100%); 
-            border-left-color: #805ad5; 
-            color: #44337a;
-        }
-        .calendar-event.reminder { 
-            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); 
-            border-left-color: #d69e2e; 
-            color: #744210;
-        }
-        .event-time { 
-            font-weight: 800; 
-        }
-        .calendar-view-tabs { 
-            display: flex; 
-            margin-bottom: 35px; 
-            border-bottom: 3px solid #e2e8f0; 
-            background: rgba(248, 250, 252, 0.8);
-            border-radius: 20px; 
-            padding: 10px;
-            backdrop-filter: blur(10px);
-        }
-        .calendar-tab { 
-            padding: 18px 35px; 
-            cursor: pointer; 
-            border-bottom: 4px solid transparent; 
-            color: #718096; 
-            font-weight: 700; 
-            border-radius: 15px; 
-            margin: 0 6px; 
-            transition: all 0.4s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 14px;
-        }
-        .calendar-tab:hover { 
-            background: rgba(102, 126, 234, 0.15); 
-            color: #667eea; 
-        }
-        .calendar-tab.active { 
-            color: #667eea; 
-            border-bottom-color: #667eea; 
-            background: white; 
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-        }
-        .calendar-content { 
-            display: none;
-        }
-        .calendar-content.active { 
-            display: block;
-        }
-        
-        /* 终极任务列表 */
-        .task-list { 
-            max-height: 550px; 
-            overflow-y: auto;
-        }
-        .task-item { 
-            background: white; 
-            padding: 25px; 
-            margin: 15px 0; 
-            border-radius: 18px; 
-            border-left: 6px solid #667eea; 
-            display: flex; 
-            align-items: center; 
-            transition: all 0.4s ease; 
-            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-        }
-        .task-item:hover { 
-            box-shadow: 0 12px 35px rgba(0,0,0,0.15); 
-            transform: translateX(8px); 
-        }
-        .task-item.completed { 
-            opacity: 0.7; 
-            text-decoration: line-through; 
-            border-left-color: #48bb78; 
-            background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
-        }
-        .task-checkbox { 
-            margin-right: 22px; 
-            width: 26px; 
-            height: 26px; 
-            cursor: pointer;
-        }
-        .task-content { 
-            flex: 1; 
-        }
-        .task-title { 
-            font-weight: 800; 
-            margin-bottom: 10px; 
-            color: #2d3748; 
-            font-size: 18px;
-        }
-        .task-meta { 
-            font-size: 14px; 
-            color: #718096; 
-            display: flex; 
-            gap: 25px; 
-            align-items: center;
-            font-weight: 600;
-        }
-        .task-case { 
-            color: #805ad5; 
-            font-weight: 800;
-        }
-        .add-task-btn { 
-            width: 100%; 
-            padding: 22px; 
-            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%); 
-            border: 3px dashed #cbd5e0; 
-            border-radius: 18px; 
-            color: #718096; 
-            cursor: pointer; 
-            text-align: center; 
-            margin-top: 25px; 
-            font-weight: 700; 
-            transition: all 0.4s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 16px;
-        }
-        .add-task-btn:hover { 
-            background: linear-gradient(135deg, #e6fffa 0%, #b2f5ea 100%); 
-            border-color: #38b2ac; 
-            color: #234e52; 
-            transform: translateY(-3px);
-        }
-        
-        .logout-btn {
-            position: absolute;
-            right: 40px;
-            top: 50%;
-            transform: translateY(-50%);
-            padding: 15px 25px;
-            background: rgba(102, 126, 234, 0.15);
-            border: 1px solid rgba(102, 126, 234, 0.3);
-            border-radius: 12px;
-            color: #667eea;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: 700;
-            transition: all 0.4s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .logout-btn:hover {
-            background: rgba(102, 126, 234, 0.25);
-            transform: translateY(-50%) translateY(-3px);
-        }
-        
-        /* 滚动条美化 */
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 15px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 15px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
-        }
+        /* 日历样式 */
+        .calendar-grid-month { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 1px; background-color: #e5e7eb; border: 1px solid #e5e7eb; border-radius: 0.5rem; overflow: hidden; }
+        .calendar-grid-week { display: grid; grid-template-columns: 60px repeat(7, minmax(0, 1fr)); gap: 1px; background-color: #e5e7eb; border: 1px solid #e5e7eb; border-radius: 0.5rem; overflow: hidden; }
+        .calendar-grid-day { display: grid; grid-template-columns: 60px minmax(0, 1fr); gap: 1px; background-color: #e5e7eb; border: 1px solid #e5e7eb; border-radius: 0.5rem; overflow: hidden; }
+        .calendar-cell { background-color: white; min-height: 100px; padding: 0.5rem; transition: background-color 0.2s; cursor: pointer; }
+        .calendar-cell:hover { background-color: #f8fafc; }
+        .calendar-cell-time { background-color: white; min-height: 60px; padding: 0.25rem; transition: background-color 0.2s; cursor: pointer; border-bottom: 1px solid #f3f4f6; }
+        .calendar-cell-time:hover { background-color: #f8fafc; }
+        .calendar-header-cell { background-color: #f9fafb; padding: 0.5rem; text-align: center; font-weight: 600; color: #4b5563; font-size: 0.875rem; }
+        .time-label { background-color: #f9fafb; text-align: center; font-size: 0.75rem; color: #6b7280; padding-top: 0.5rem; border-bottom: 1px solid #f3f4f6; }
     </style>
 </head>
-<body>
-    <div id="loginPage" class="login-container">
-        <div class="login-box">
-            <h2 class="login-title">⚖️ Ray律师案件管理系统</h2>
-            <div class="login-input">
-                <label>管理员密码</label>
-                <input type="password" id="passwordInput" placeholder="请输入管理密码" style="width:100%;padding:18px;border:2px solid #e2e8f0;border-radius:15px;font-size:16px;">
+<body class="text-gray-800 h-screen overflow-hidden flex items-center justify-center">
+    <div class="bg-overlay"></div>
+
+    <!-- 登录界面 -->
+    <div id="login-screen" class="glass-panel p-10 rounded-2xl w-full max-w-md mx-4 transform transition-all duration-500">
+        <div class="text-center mb-8">
+            <div class="inline-block p-4 rounded-full bg-law-navy text-law-gold mb-4 shadow-lg"><i class="fa-solid fa-scale-balanced text-4xl"></i></div>
+            <h1 class="law-title text-3xl font-bold text-law-navy mb-2">Ray律师案件管理系统</h1>
+        </div>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">账号</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><i class="fa-solid fa-user"></i></span>
+                    <input type="text" id="username-input" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-law-gold outline-none" placeholder="请输入账号">
+                </div>
             </div>
-            <button class="login-btn" onclick="checkPassword()">进入系统</button>
-            <div id="errorMsg" class="error-msg">密码错误，请重试</div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">密码</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><i class="fa-solid fa-lock"></i></span>
+                    <input type="password" id="password-input" class="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-law-gold outline-none" placeholder="请输入密码" onkeypress="handleLoginKeyPress(event)">
+                    <button type="button" onclick="togglePasswordVisibility('password-input', 'login-eye-icon')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
+                        <i id="login-eye-icon" class="fa-solid fa-eye-slash"></i>
+                    </button>
+                </div>
+                <p id="login-error" class="text-red-500 text-sm mt-2 hidden"><i class="fa-solid fa-circle-exclamation mr-1"></i>账号或密码错误</p>
+            </div>
+            <button onclick="login()" class="w-full bg-law-navy hover:bg-gray-800 text-white font-semibold py-3 px-4 rounded-lg transition-colors shadow-md mt-4">进入系统</button>
         </div>
     </div>
-    
-    <div id="mainPage" style="display:none;">
-        <div class="header">
-            <h1>⚖️ Ray律师案件管理系统</h1>
-            <p>Ultimate Professional Legal Case Management Platform</p>
-            <button class="logout-btn" onclick="logout()">退出登录</button>
-        </div>
-        
-        <div class="container">
-            <div class="sidebar">
-                <h3 style="margin-bottom: 30px; color: #2d3748; font-size: 22px; font-weight: 800;">📅 今日日程</h3>
-                <div id="todayTasks" class="task-list"></div>
-                <button class="add-task-btn" onclick="showAddTaskModal()">+ 添加任务</button>
+
+    <!-- 主系统界面 -->
+    <div id="app-screen" class="hidden w-full h-full flex flex-col md:flex-row">
+        <!-- 侧边栏 -->
+        <aside class="w-full md:w-64 bg-law-navy text-white flex flex-col shadow-2xl z-10">
+            <div class="p-6 flex items-center space-x-3 border-b border-gray-700">
+                <i class="fa-solid fa-scale-balanced text-law-gold text-2xl"></i>
+                <div>
+                    <h2 class="law-title text-lg font-bold tracking-wide">Ray Law System</h2>
+                    <p class="text-xs text-gray-400 mt-1">当前用户: <span id="current-user-display" class="text-law-gold"></span></p>
+                </div>
             </div>
+            <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg bg-law-gold/20 text-law-gold transition-colors"><i class="fa-solid fa-list-check w-5"></i><span>待办任务</span></button>
+                <button onclick="switchTab('calendar')" id="nav-calendar" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-white/10 text-gray-300 transition-colors"><i class="fa-regular fa-calendar-days w-5"></i><span>日历视图</span></button>
+                <button onclick="switchTab('cases')" id="nav-cases" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-white/10 text-gray-300 transition-colors"><i class="fa-solid fa-folder-open w-5"></i><span>案件管理</span></button>
+                <button onclick="switchTab('completed')" id="nav-completed" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-white/10 text-gray-300 transition-colors"><i class="fa-solid fa-check-double w-5"></i><span>已完成任务</span></button>
+                <div class="my-4 border-t border-gray-700"></div>
+                <button onclick="switchTab('profile')" id="nav-profile" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-white/10 text-gray-300 transition-colors"><i class="fa-solid fa-user-gear w-5"></i><span>个人中心</span></button>
+                <button onclick="switchTab('users')" id="nav-users" class="nav-btn hidden w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-white/10 text-gray-300 transition-colors"><i class="fa-solid fa-users-cog w-5"></i><span>用户管理 (Admin)</span></button>
+            </nav>
+            <div class="p-4 border-t border-gray-700">
+                <button onclick="logout()" class="w-full flex items-center justify-center space-x-2 px-4 py-2 rounded-lg border border-gray-600 hover:bg-gray-800 text-gray-300 transition-colors"><i class="fa-solid fa-sign-out-alt"></i><span>退出登录</span></button>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 h-full overflow-y-auto bg-gray-50/90 backdrop-blur-sm p-4 md:p-8 relative">
             
-            <div class="main-content">
-                <div class="nav-tabs">
-                    <div class="nav-tab active" onclick="switchMainTab('cases')">案件管理</div>
-                    <div class="nav-tab" onclick="switchMainTab('calendar')">日历视图</div>
+            <!-- 1. 待办任务视图 -->
+            <div id="view-dashboard" class="view-section">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="law-title text-3xl font-bold text-law-navy">待办任务</h2>
+                    <button onclick="openTaskModal()" class="bg-law-gold hover:bg-yellow-600 text-white px-5 py-2.5 rounded-lg shadow-md transition-colors font-medium flex items-center"><i class="fa-solid fa-plus mr-2"></i> 添加任务</button>
                 </div>
-                
-                <div id="casesTab" class="tab-content active">
-                    <div class="nav-tabs">
-                        <div class="nav-tab active" onclick="switchTab('list')">案件列表</div>
-                        <div class="nav-tab" onclick="switchTab('add')">添加案件</div>
-                    </div>
-                    
-                    <div id="listTab" class="tab-content active">
-                        <div id="casesContainer" class="cases-grid"></div>
-                    </div>
-                    
-                    <div id="addTab" class="tab-content">
-                        <div class="case-form">
-                            <h3 style="margin-bottom: 30px; color: #2d3748; font-size: 24px; font-weight: 800;">添加新案件</h3>
-                            <div class="form-group">
-                                <label>案件号</label>
-                                <input type="text" id="caseNumber" placeholder="如: CASE-2026-001">
-                            </div>
-                            <div class="form-group">
-                                <label>案件名称</label>
-                                <input type="text" id="caseName" placeholder="案件全称">
-                            </div>
-                            <div class="form-group">
-                                <label>客户名称</label>
-                                <input type="text" id="clientName" placeholder="委托客户">
-                            </div>
-                            <div class="form-group">
-                                <label>负责律师</label>
-                                <input type="text" id="lawyer" placeholder="负责律师姓名" value="Ray律师">
-                            </div>
-                            <div class="form-group">
-                                <label>当前状态</label>
-                                <select id="caseStatus">
-                                    <option value="进行中">进行中</option>
-                                    <option value="待审">待审</option>
-                                    <option value="已结案">已结案</option>
-                                    <option value="暂停">暂停</option>
-                                    <option value="归档">归档</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>预估费用</label>
-                                <input type="number" id="estimatedCost" placeholder="金额">
-                            </div>
-                            <button onclick="addCase()" class="btn-success">添加案件</button>
-                            <button onclick="switchTab('list')" class="btn-secondary">返回列表</button>
+                <p class="text-sm text-gray-500 mb-4"><i class="fa-solid fa-info-circle mr-1"></i> 提示：按住任务列表项可上下拖拽排序。</p>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-0" id="task-list-container"></div>
+                </div>
+            </div>
+
+            <!-- 2. 日历视图 -->
+            <div id="view-calendar" class="view-section hidden flex flex-col h-full">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="law-title text-3xl font-bold text-law-navy">日历视图</h2>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex space-x-1 bg-white p-1 rounded-lg shadow-sm border border-gray-100">
+                            <button onclick="setCalendarView('month')" id="cal-tab-month" class="px-4 py-1.5 text-sm font-medium rounded-md bg-law-navy text-white transition-all">月</button>
+                            <button onclick="setCalendarView('week')" id="cal-tab-week" class="px-4 py-1.5 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-100 transition-all">周</button>
+                            <button onclick="setCalendarView('day')" id="cal-tab-day" class="px-4 py-1.5 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-100 transition-all">日</button>
+                        </div>
+                        <div class="flex space-x-2 items-center bg-white px-3 py-1.5 rounded-lg shadow-sm border border-gray-100">
+                            <button onclick="prevCalendarStep()" class="p-1.5 text-gray-500 hover:text-law-navy hover:bg-gray-100 rounded transition-colors"><i class="fa-solid fa-chevron-left"></i></button>
+                            <span id="calendar-date-display" class="font-bold text-sm min-w-[120px] text-center text-law-navy"></span>
+                            <button onclick="nextCalendarStep()" class="p-1.5 text-gray-500 hover:text-law-navy hover:bg-gray-100 rounded transition-colors"><i class="fa-solid fa-chevron-right"></i></button>
                         </div>
                     </div>
                 </div>
+                <p class="text-sm text-gray-500 mb-4"><i class="fa-solid fa-info-circle mr-1"></i> 提示：点击日历中的空白区域即可快速添加对应时间的任务。</p>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex-1 overflow-y-auto" id="calendar-container">
+                    <!-- 日历内容由JS动态生成 -->
+                </div>
+            </div>
+
+            <!-- 3. 案件管理视图 -->
+            <div id="view-cases" class="view-section hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="law-title text-3xl font-bold text-law-navy">案件管理</h2>
+                    <div class="flex space-x-3">
+                        <button onclick="openCaseModal()" class="bg-law-navy hover:bg-gray-800 text-white px-5 py-2.5 rounded-lg shadow-md transition-colors font-medium flex items-center"><i class="fa-solid fa-folder-plus mr-2"></i> 添加新案件</button>
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-4 flex gap-4 items-center justify-between">
+                    <div class="flex space-x-2 bg-gray-100 p-1 rounded-lg">
+                        <button onclick="setCaseTab('ongoing')" id="tab-ongoing" class="px-4 py-2 text-sm font-medium rounded-md bg-white shadow-sm text-law-navy transition-all">正在进行的案件</button>
+                        <button onclick="setCaseTab('completed')" id="tab-completed" class="px-4 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 transition-all">已经完成的案件</button>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-500 mb-4"><i class="fa-solid fa-info-circle mr-1"></i> 提示：按住案件行可上下拖拽排序。</p>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 text-gray-600 text-sm uppercase tracking-wider border-b border-gray-200">
+                                <th class="px-6 py-4 font-medium w-10"></th>
+                                <th class="px-6 py-4 font-medium">案件号</th>
+                                <th class="px-6 py-4 font-medium w-1/3">案件名称 & 最新动态</th>
+                                <th class="px-6 py-4 font-medium">客户名称</th>
+                                <th class="px-6 py-4 font-medium" id="case-status-header">任务DL</th>
+                                <th class="px-6 py-4 font-medium text-right">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="case-list-body" class="divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 4. 案件详情页 -->
+            <div id="view-case-detail" class="view-section hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <button onclick="switchTab('cases')" class="text-law-gray hover:text-law-navy transition-colors flex items-center"><i class="fa-solid fa-arrow-left mr-2"></i> 返回</button>
+                    <div class="flex space-x-3">
+                        <button id="btn-delete-case" onclick="promptDeleteCase()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg shadow transition-colors text-sm flex items-center"><i class="fa-solid fa-trash mr-2"></i> 删除案件</button>
+                        <button onclick="openEditCaseModal()" class="bg-law-navy hover:bg-gray-800 text-white px-4 py-2 rounded-lg shadow transition-colors text-sm flex items-center"><i class="fa-solid fa-pen-to-square mr-2"></i> 修改案件信息</button>
+                    </div>
+                </div>
                 
-                <div id="calendarTab" class="tab-content">
-                    <div class="calendar-view-tabs">
-                        <div class="calendar-tab active" onclick="switchCalendarView('month')">月视图</div>
-                        <div class="calendar-tab" onclick="switchCalendarView('day')">日视图</div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+                    <div class="px-6 py-4 bg-law-navy text-white flex justify-between items-center">
+                        <h2 class="law-title text-2xl font-bold" id="detail-case-name">案件名称</h2>
+                        <span id="detail-case-status" class="px-3 py-1 rounded-full text-sm font-medium bg-white/20">状态</span>
+                    </div>
+                    <div class="p-6 grid grid-cols-2 md:grid-cols-4 gap-6 bg-gray-50 border-b border-gray-100">
+                        <div><p class="text-sm text-gray-500 mb-1">案件号</p><p class="font-medium text-gray-800" id="detail-case-id">-</p></div>
+                        <div><p class="text-sm text-gray-500 mb-1">客户名称</p><p class="font-medium text-gray-800" id="detail-case-client">-</p></div>
+                        <div><p class="text-sm text-gray-500 mb-1" id="detail-date-label">任务DL</p><p class="font-medium text-gray-800" id="detail-case-date">-</p></div>
                     </div>
                     
-                    <div id="monthView" class="calendar-content active">
-                        <div class="calendar-header">
-                            <div class="calendar-nav">
-                                <button onclick="changeMonth(-1)" class="btn-secondary">‹</button>
-                                <h3 id="currentMonth"></h3>
-                                <button onclick="changeMonth(1)" class="btn-secondary">›</button>
+                    <div class="p-6">
+                        <h3 class="font-bold text-lg text-gray-800 mb-4"><i class="fa-solid fa-pen-to-square mr-2 text-law-gold"></i>更新案件记录</h3>
+                        <div class="flex flex-col space-y-3">
+                            <textarea id="case-log-input" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-law-gold outline-none" placeholder="输入最新的案件进展..."></textarea>
+                            <div class="flex justify-end space-x-3">
+                                <button id="submit-log-btn" onclick="addCaseLog()" class="bg-law-navy hover:bg-gray-800 text-white px-6 py-2 rounded-lg shadow transition-colors">提交记录</button>
                             </div>
-                            <button onclick="goToToday()" class="btn-success">今天</button>
                         </div>
-                        <div class="calendar-grid" id="monthGrid"></div>
                     </div>
-                    
-                    <div id="dayView" class="calendar-content">
-                        <div class="calendar-header">
-                            <div class="calendar-nav">
-                                <button onclick="changeDay(-1)" class="btn-secondary">‹</button>
-                                <h3 id="currentDay"></h3>
-                                <button onclick="changeDay(1)" class="btn-secondary">›</button>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="font-bold text-lg text-gray-800"><i class="fa-solid fa-clock-rotate-left mr-2 text-law-gold"></i>案件动态时间轴</h3>
+                        <button onclick="exportLogsToExcel()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow transition-colors text-sm flex items-center"><i class="fa-solid fa-file-excel mr-2"></i> 导出为Excel</button>
+                    </div>
+                    <div class="relative border-l-2 border-gray-200 ml-3 space-y-8" id="case-logs-container"></div>
+                </div>
+            </div>
+
+            <!-- 5. 已完成任务视图 -->
+            <div id="view-completed" class="view-section hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="law-title text-3xl font-bold text-law-navy">已完成任务</h2>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-0" id="completed-task-container"></div>
+                </div>
+            </div>
+
+            <!-- 6. 个人中心 (修改用户名和密码) -->
+            <div id="view-profile" class="view-section hidden">
+                <h2 class="law-title text-3xl font-bold text-law-navy mb-6">个人中心</h2>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 max-w-lg">
+                    <p class="text-sm text-gray-500 mb-6"><i class="fa-solid fa-circle-info mr-1"></i> 在此修改您的显示用户名或登录密码。修改后下次登录生效。修改用户名会自动同步更新所有历史记录中的操作人名称。</p>
+                    <div class="space-y-4">
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">当前登录账号</label><input type="text" id="profile-account" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed" disabled></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">显示用户名</label><input type="text" id="profile-username" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-law-gold"></div>
+                        
+                        <div class="pt-4 border-t border-gray-100">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">新密码</label>
+                            <div class="relative">
+                                <input type="password" id="profile-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-law-gold pr-10" placeholder="留空则不修改密码">
+                                <button type="button" onclick="togglePasswordVisibility('profile-password', 'eye-icon-1')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
+                                    <i id="eye-icon-1" class="fa-solid fa-eye-slash"></i>
+                                </button>
                             </div>
-                            <button onclick="goToToday()" class="btn-success">今天</button>
                         </div>
-                        <div id="dayEvents" class="day-view"></div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">确认新密码</label>
+                            <div class="relative">
+                                <input type="password" id="profile-password-confirm" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-law-gold pr-10" placeholder="请再次输入新密码以确认">
+                                <button type="button" onclick="togglePasswordVisibility('profile-password-confirm', 'eye-icon-2')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
+                                    <i id="eye-icon-2" class="fa-solid fa-eye-slash"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button onclick="updateProfile()" class="w-full bg-law-navy text-white px-4 py-3 rounded-lg shadow mt-6 hover:bg-gray-800 transition-colors font-medium">保存修改</button>
                     </div>
+                </div>
+            </div>
+
+            <!-- 7. 用户管理 (Admin) -->
+            <div id="view-users" class="view-section hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="law-title text-3xl font-bold text-law-navy">用户管理</h2>
+                    <button onclick="openModal('modal-user')" class="bg-law-gold hover:bg-yellow-600 text-white px-4 py-2 rounded-lg shadow flex items-center"><i class="fa-solid fa-plus mr-2"></i> 添加子账户</button>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead><tr class="bg-gray-50 text-gray-600 text-sm uppercase border-b"><th class="px-6 py-4">账号</th><th class="px-6 py-4">用户名</th><th class="px-6 py-4">角色</th><th class="px-6 py-4 text-right">操作</th></tr></thead>
+                        <tbody id="users-list-body" class="divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 弹窗：二次确认 -->
+    <div id="modal-confirm" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] hidden flex items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm mx-4 transform scale-95 transition-transform duration-300" id="modal-confirm-content">
+            <div class="p-6 text-center">
+                <div class="w-16 h-16 rounded-full bg-red-100 text-red-500 flex items-center justify-center mx-auto mb-4 text-3xl"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <h3 class="font-bold text-xl text-gray-800 mb-2" id="confirm-title">确认</h3>
+                <p class="text-gray-500 text-sm mb-6" id="confirm-message">确定执行此操作吗？</p>
+                <div class="flex space-x-3 justify-center">
+                    <button onclick="closeModal('modal-confirm')" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg">取消</button>
+                    <button id="confirm-action-btn" class="px-6 py-2 bg-red-500 text-white rounded-lg">确认</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 添加任务模态框 -->
-    <div id="taskModal" class="modal" style="display:none; position:fixed; z-index:2000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.6);">
-        <div class="modal-content" style="background:white; margin:5% auto; padding:50px; width:90%; max-width:550px; border-radius:25px; box-shadow: 0 40px 100px rgba(0,0,0,0.3);">
-            <h3 style="margin-bottom: 35px; color: #2d3748; font-size: 26px; font-weight: 800;">添加新任务</h3>
-            <div class="form-group">
-                <label>任务标题</label>
-                <input type="text" id="taskTitle" placeholder="输入任务标题">
+    <!-- 弹窗：添加任务 -->
+    <div id="modal-task" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 transform scale-95 transition-transform duration-300" id="modal-task-content">
+            <div class="px-6 py-4 border-b bg-law-navy text-white rounded-t-xl flex justify-between"><h3 class="font-bold">添加任务</h3><button onclick="closeModal('modal-task')"><i class="fa-solid fa-times"></i></button></div>
+            <div class="p-6 space-y-4">
+                <div><label class="block text-sm mb-1">任务标题 *</label><input type="text" id="task-title" class="w-full px-4 py-2 border rounded-lg outline-none"></div>
+                <div><label class="block text-sm mb-1">日期时间</label><input type="datetime-local" id="task-datetime" class="w-full px-4 py-2 border rounded-lg outline-none"></div>
+                <div>
+                    <label class="block text-sm mb-1">标记颜色</label>
+                    <div class="flex space-x-3">
+                        <label class="cursor-pointer"><input type="radio" name="taskColor" value="blue" class="peer hidden" checked><div class="w-6 h-6 rounded-full bg-blue-500 peer-checked:ring-2 ring-offset-2 ring-blue-500"></div></label>
+                        <label class="cursor-pointer"><input type="radio" name="taskColor" value="red" class="peer hidden"><div class="w-6 h-6 rounded-full bg-red-500 peer-checked:ring-2 ring-offset-2 ring-red-500"></div></label>
+                        <label class="cursor-pointer"><input type="radio" name="taskColor" value="green" class="peer hidden"><div class="w-6 h-6 rounded-full bg-green-500 peer-checked:ring-2 ring-offset-2 ring-green-500"></div></label>
+                        <label class="cursor-pointer"><input type="radio" name="taskColor" value="purple" class="peer hidden"><div class="w-6 h-6 rounded-full bg-purple-500 peer-checked:ring-2 ring-offset-2 ring-purple-500"></div></label>
+                        <label class="cursor-pointer"><input type="radio" name="taskColor" value="yellow" class="peer hidden"><div class="w-6 h-6 rounded-full bg-yellow-500 peer-checked:ring-2 ring-offset-2 ring-yellow-500"></div></label>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label>关联案件</label>
-                <select id="taskCase">
-                    <option value="">无关联案件</option>
-                </select>
+            <div class="px-6 py-4 border-t flex justify-end space-x-3 bg-gray-50 rounded-b-xl">
+                <button onclick="closeModal('modal-task')" class="px-4 py-2 border rounded-lg">取消</button>
+                <button onclick="saveTask()" class="px-4 py-2 bg-law-gold text-white rounded-lg">保存</button>
             </div>
-            <div class="form-group">
-                <label>日期时间</label>
-                <input type="datetime-local" id="taskDate">
+        </div>
+    </div>
+
+    <!-- 弹窗：添加/修改案件 -->
+    <div id="modal-case" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-4 transform scale-95 transition-transform duration-300" id="modal-case-content">
+            <div class="px-6 py-4 border-b bg-law-navy text-white rounded-t-xl flex justify-between"><h3 class="font-bold" id="modal-case-title">添加案件</h3><button onclick="closeModal('modal-case')"><i class="fa-solid fa-times"></i></button></div>
+            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input type="hidden" id="case-form-mode" value="add">
+                <div><label class="block text-sm mb-1">案件号 *</label><input type="text" id="case-id" class="w-full px-4 py-2 border rounded-lg outline-none"></div>
+                <div><label class="block text-sm mb-1">案件名称 *</label><input type="text" id="case-name" class="w-full px-4 py-2 border rounded-lg outline-none"></div>
+                <div><label class="block text-sm mb-1">客户名称 *</label><input type="text" id="case-client" class="w-full px-4 py-2 border rounded-lg outline-none"></div>
+                <div><label class="block text-sm mb-1">当前状态</label>
+                    <select id="case-status" class="w-full px-4 py-2 border rounded-lg outline-none bg-white" onchange="toggleCaseDateInput()">
+                        <option value="进行中">进行中</option>
+                        <option value="已结案">已结案</option>
+                    </select>
+                </div>
+                <div id="div-task-dl"><label class="block text-sm mb-1">任务DL (截止日期)</label><input type="date" id="case-task-dl" class="w-full px-4 py-2 border rounded-lg outline-none"></div>
+                <div id="div-close-date" class="hidden"><label class="block text-sm mb-1">结案时间</label><input type="date" id="case-close-date" class="w-full px-4 py-2 border rounded-lg outline-none"></div>
             </div>
-            <div class="form-group">
-                <label>任务描述</label>
-                <textarea id="taskDescription" rows="4" placeholder="详细描述"></textarea>
+            <div class="px-6 py-4 border-t flex justify-end space-x-3 bg-gray-50 rounded-b-xl">
+                <button onclick="closeModal('modal-case')" class="px-4 py-2 border rounded-lg">取消</button>
+                <button onclick="saveCase()" class="px-4 py-2 bg-law-navy text-white rounded-lg">保存</button>
             </div>
-            <button onclick="saveTask()" class="btn-success" style="margin-right: 20px;">保存任务</button>
-            <button onclick="closeTaskModal()" class="btn-secondary">取消</button>
+        </div>
+    </div>
+
+    <!-- 弹窗：添加用户 -->
+    <div id="modal-user" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 transform scale-95 transition-transform duration-300" id="modal-user-content">
+            <div class="px-6 py-4 border-b bg-law-navy text-white rounded-t-xl flex justify-between"><h3 class="font-bold">添加子账户</h3><button onclick="closeModal('modal-user')"><i class="fa-solid fa-times"></i></button></div>
+            <div class="p-6 space-y-4">
+                <div><label class="block text-sm mb-1">登录账号 *</label><input type="text" id="new-user-account" class="w-full px-4 py-2 border rounded-lg outline-none"></div>
+                <div><label class="block text-sm mb-1">显示用户名 *</label><input type="text" id="new-user-name" class="w-full px-4 py-2 border rounded-lg outline-none"></div>
+                <div><label class="block text-sm mb-1">初始密码 *</label><input type="password" id="new-user-pwd" class="w-full px-4 py-2 border rounded-lg outline-none" value="123456"></div>
+            </div>
+            <div class="px-6 py-4 border-t flex justify-end space-x-3 bg-gray-50 rounded-b-xl">
+                <button onclick="closeModal('modal-user')" class="px-4 py-2 border rounded-lg">取消</button>
+                <button onclick="saveUser()" class="px-4 py-2 bg-law-navy text-white rounded-lg">保存</button>
+            </div>
         </div>
     </div>
 
     <script>
-        let cases = JSON.parse(localStorage.getItem('cases') || '[]');
-        let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-        let currentCaseId = null;
-        let currentDate = new Date();
-        let calendarView = 'month';
+        // --- 数据模型与持久化 ---
+        const defaultUsers = [
+            { account: 'admin', username: '管理员(Admin)', password: 'admin123', role: 'admin' },
+            { account: 'user1', username: '律师A', password: '123', role: 'user' }
+        ];
         
-        // 初始化
-        function init() {
-            renderCases();
-            renderTasks();
-            renderCalendar();
-            updateTodayTasks();
-            updateTaskCaseOptions();
-        }
-        
-        function checkPassword() {
-            const password = document.getElementById('passwordInput').value;
-            if (password === 'admin123') {
-                document.getElementById('loginPage').style.display = 'none';
-                document.getElementById('mainPage').style.display = 'block';
-                init();
+        let users = [];
+        let currentUser = null;
+
+        try {
+            const storedUsers = localStorage.getItem('ray_law_users');
+            if (storedUsers) {
+                users = JSON.parse(storedUsers);
             } else {
-                document.getElementById('errorMsg').style.display = 'block';
-                document.getElementById('passwordInput').value = '';
+                users = defaultUsers;
+                localStorage.setItem('ray_law_users', JSON.stringify(users));
             }
+        } catch(e) {
+            console.warn("无法访问 localStorage，将使用默认数据。");
+            users = defaultUsers;
         }
-        
-        function logout() {
-            document.getElementById('mainPage').style.display = 'none';
-            document.getElementById('loginPage').style.display = 'flex';
-            document.getElementById('passwordInput').value = '';
-            document.getElementById('errorMsg').style.display = 'none';
+
+        function saveUsersToStorage() {
+            try { localStorage.setItem('ray_law_users', JSON.stringify(users)); } catch(e) {}
         }
+
+        let cases = [
+            { id: '2026-MC-001', name: '某科技公司股权纠纷案', client: '王先生', status: '进行中', taskDL: '2026-04-15', closeDate: '', logs: [
+                { id: 101, time: '2026-03-20 10:00', author: '管理员(Admin)', content: '正式接受委托，签署代理合同。' }
+            ] },
+            { id: '2025-MC-088', name: '张三劳动仲裁案', client: '张三', status: '已结案', taskDL: '', closeDate: '2025-12-10', logs: [] }
+        ];
+
+        let activeTasks = [
+            { id: 1, title: '起草起诉状', datetime: '2026-04-05T10:00', color: 'blue' },
+            { id: 2, title: '法院递交材料', datetime: '2026-04-10T14:30', color: 'red' }
+        ];
+
+        let completedTasks = [
+            { id: 3, title: '初次客户面谈', completedAt: '2026-03-19 15:30:00' }
+        ];
         
-        document.getElementById('passwordInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') checkPassword();
+        let currentViewCaseId = null;
+        let currentCaseTab = 'ongoing'; 
+        
+        let calendarDate = new Date();
+        let currentCalendarView = 'month'; // 'month', 'week', 'day'
+
+        const taskColorMap = {
+            blue: 'bg-blue-100 text-blue-800 border-blue-200',
+            red: 'bg-red-100 text-red-800 border-red-200',
+            green: 'bg-green-100 text-green-800 border-green-200',
+            purple: 'bg-purple-100 text-purple-800 border-purple-200',
+            yellow: 'bg-yellow-100 text-yellow-800 border-yellow-200'
+        };
+
+        // --- 拖拽排序相关变量 ---
+        let dragSrcEl = null;
+        let dragType = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('confirm-action-btn').addEventListener('click', () => {
+                if(confirmActionCallback) confirmActionCallback();
+                closeModal('modal-confirm');
+            });
         });
-        
-        // 标签页切换
-        function switchMainTab(tab) {
-            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('#mainPage .tab-content').forEach(c => c.classList.remove('active'));
-            
-            if (tab === 'cases') {
-                document.querySelector('#mainPage .nav-tab:nth-child(1)').classList.add('active');
-                document.getElementById('casesTab').classList.add('active');
-            } else if (tab === 'calendar') {
-                document.querySelector('#mainPage .nav-tab:nth-child(2)').classList.add('active');
-                document.getElementById('calendarTab').classList.add('active');
-            }
-        }
-        
-        function switchTab(tab) {
-            document.querySelectorAll('#casesTab .nav-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('#casesTab .tab-content').forEach(c => c.classList.remove('active'));
-            
-            if (tab === 'list') {
-                document.querySelector('#casesTab .nav-tab:nth-child(1)').classList.add('active');
-                document.getElementById('listTab').classList.add('active');
-            } else if (tab === 'add') {
-                document.querySelector('#casesTab .nav-tab:nth-child(2)').classList.add('active');
-                document.getElementById('addTab').classList.add('active');
-            }
-        }
-        
-        // 案件管理功能
-        function addCase() {
-            const caseNumber = document.getElementById('caseNumber').value.trim();
-            const caseName = document.getElementById('caseName').value.trim();
-            const clientName = document.getElementById('clientName').value.trim();
-            const lawyer = document.getElementById('lawyer').value.trim();
-            const status = document.getElementById('caseStatus').value;
-            const estimatedCost = document.getElementById('estimatedCost').value;
 
-            if (!caseNumber || !caseName) {
-                alert('案件号和案件名称为必填项');
-                return;
-            }
-
-            const newCase = {
-                id: Date.now(),
-                caseNumber,
-                caseName,
-                clientName,
-                lawyer,
-                status,
-                estimatedCost: estimatedCost ? parseFloat(estimatedCost) : 0,
-                actualCost: 0,
-                createdTime: new Date().toLocaleString('zh-CN'),
-                lastUpdate: new Date().toLocaleString('zh-CN'),
-                statusHistory: [`${new Date().toLocaleString('zh-CN')} - 案件创建，初始状态：${status}`]
-            };
-
-            cases.unshift(newCase);
-            localStorage.setItem('cases', JSON.stringify(cases));
-            switchTab('list');
-            renderCases();
-            clearForm();
-            updateTaskCaseOptions();
-        }
-        
-        function clearForm() {
-            document.getElementById('caseNumber').value = '';
-            document.getElementById('caseName').value = '';
-            document.getElementById('clientName').value = '';
-            document.getElementById('lawyer').value = 'Ray律师';
-            document.getElementById('caseStatus').value = '进行中';
-            document.getElementById('estimatedCost').value = '';
-        }
-        
-        function renderCases() {
-            const container = document.getElementById('casesContainer');
-            container.innerHTML = '';
+        // --- 登录与用户系统 ---
+        function handleLoginKeyPress(e) { if (e.key === 'Enter') login(); }
+        function login() {
+            const acc = document.getElementById('username-input').value;
+            const pwd = document.getElementById('password-input').value;
+            const user = users.find(u => u.account === acc && u.password === pwd);
             
-            if (cases.length === 0) {
-                container.innerHTML = '<p style="text-align:center; color:#718096; padding:80px; font-size:18px;">暂无案件，请添加第一个案件</p>';
-                return;
-            }
-            
-            cases.forEach(caseItem => {
-                const card = document.createElement('div');
-                card.className = 'case-card';
-                const statusClass = getStatusClass(caseItem.status);
+            if (user) {
+                currentUser = user;
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('app-screen').classList.remove('hidden');
+                document.getElementById('current-user-display').textContent = user.username;
                 
-                card.innerHTML = `
-                    <div class="case-header">
-                        <div class="case-number">${caseItem.caseNumber}</div>
-                        <div class="case-name">${caseItem.caseName}</div>
-                        <span class="case-status ${statusClass}">${caseItem.status}</span>
-                    </div>
-                    <div class="case-meta">
-                        <div><strong>客户:</strong> ${caseItem.clientName || '未指定'}</div>
-                        <div><strong>律师:</strong> ${caseItem.lawyer || 'Ray律师'}</div>
-                        <div><strong>费用:</strong> ¥${caseItem.estimatedCost.toLocaleString()}</div>
-                        <div><strong>创建:</strong> ${caseItem.createdTime}</div>
-                    </div>
-                `;
+                if(user.role === 'admin') document.getElementById('nav-users').classList.remove('hidden');
+                else document.getElementById('nav-users').classList.add('hidden');
                 
-                container.appendChild(card);
+                switchTab('dashboard');
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        }
+        function logout() { location.reload(); }
+
+        // --- 导航 ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(btn => { btn.classList.remove('bg-law-gold/20', 'text-law-gold'); btn.classList.add('text-gray-300'); });
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            if(activeBtn) { activeBtn.classList.remove('text-gray-300'); activeBtn.classList.add('bg-law-gold/20', 'text-law-gold'); }
+            
+            if(tabId === 'dashboard') renderTasks();
+            if(tabId === 'calendar') renderCalendar();
+            if(tabId === 'cases') renderCases();
+            if(tabId === 'completed') renderCompletedTasks();
+            if(tabId === 'profile') loadProfile();
+            if(tabId === 'users' && currentUser.role === 'admin') renderUsers();
+        }
+
+        // --- 模态框基础 ---
+        function openModal(id) { const m = document.getElementById(id), c = document.getElementById(`${id}-content`); m.classList.remove('hidden'); void m.offsetWidth; m.classList.remove('opacity-0'); c.classList.remove('scale-95'); }
+        function closeModal(id) { const m = document.getElementById(id), c = document.getElementById(`${id}-content`); m.classList.add('opacity-0'); c.classList.add('scale-95'); setTimeout(() => m.classList.add('hidden'), 300); }
+        
+        let confirmActionCallback = null;
+        function openConfirmModal(title, message, callback) {
+            document.getElementById('confirm-title').textContent = title;
+            document.getElementById('confirm-message').textContent = message;
+            confirmActionCallback = callback;
+            openModal('modal-confirm');
+        }
+
+        // --- 个人中心 (修改用户名和密码) ---
+        function loadProfile() {
+            document.getElementById('profile-account').value = currentUser.account;
+            document.getElementById('profile-username').value = currentUser.username;
+            document.getElementById('profile-password').value = '';
+            document.getElementById('profile-password-confirm').value = '';
+        }
+
+        function togglePasswordVisibility(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            }
+        }
+
+        function updateProfile() {
+            const newName = document.getElementById('profile-username').value;
+            const newPwd = document.getElementById('profile-password').value;
+            const confirmPwd = document.getElementById('profile-password-confirm').value;
+
+            if(!newName) return alert('显示用户名不能为空');
+            
+            if(newPwd) {
+                if(newPwd !== confirmPwd) return alert('两次输入的密码不一致！请重新输入。');
+                currentUser.password = newPwd;
+            }
+            
+            const oldName = currentUser.username;
+            currentUser.username = newName;
+
+            // 同步更新历史记录中的操作人
+            if(oldName !== newName) {
+                cases.forEach(c => {
+                    c.logs.forEach(log => {
+                        if(log.author === oldName) log.author = newName;
+                    });
+                });
+            }
+
+            const userIndex = users.findIndex(u => u.account === currentUser.account);
+            if(userIndex !== -1) {
+                users[userIndex] = currentUser;
+                saveUsersToStorage();
+            }
+
+            document.getElementById('current-user-display').textContent = currentUser.username;
+            document.getElementById('profile-password').value = '';
+            document.getElementById('profile-password-confirm').value = '';
+            alert('个人信息修改成功！历史记录已同步更新。');
+        }
+
+        // --- 用户管理 ---
+        function renderUsers() {
+            const tbody = document.getElementById('users-list-body'); tbody.innerHTML = '';
+            users.forEach(u => {
+                const isSelf = u.account === currentUser.account;
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="px-6 py-4">${u.account}</td>
+                        <td class="px-6 py-4">${u.username}</td>
+                        <td class="px-6 py-4">${u.role === 'admin' ? '管理员' : '普通用户'}</td>
+                        <td class="px-6 py-4 text-right">
+                            ${!isSelf ? `<button onclick="deleteUser('${u.account}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i> 删除</button>` : '<span class="text-gray-400">当前账号</span>'}
+                        </td>
+                    </tr>`;
             });
         }
-        
-        function getStatusClass(status) {
-            const map = {
-                '进行中': 'status-active', 
-                '待审': 'status-pending', 
-                '已结案': 'status-closed', 
-                '暂停': 'status-paused', 
-                '归档': 'status-archived'
-            };
-            return map[status] || 'status-active';
+        function saveUser() {
+            const acc = document.getElementById('new-user-account').value;
+            const name = document.getElementById('new-user-name').value;
+            const pwd = document.getElementById('new-user-pwd').value;
+            if(!acc || !name || !pwd) return alert('请填写完整');
+            if(users.find(u => u.account === acc)) return alert('账号已存在');
+            users.push({ account: acc, username: name, password: pwd, role: 'user' });
+            saveUsersToStorage(); renderUsers(); closeModal('modal-user');
         }
-        
-        // 日历功能
-        function switchCalendarView(view) {
-            calendarView = view;
-            document.querySelectorAll('.calendar-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.calendar-content').forEach(c => c.classList.remove('active'));
-            
-            if (view === 'month') {
-                document.querySelector('.calendar-tab:nth-child(1)').classList.add('active');
-                document.getElementById('monthView').classList.add('active');
-            } else if (view === 'day') {
-                document.querySelector('.calendar-tab:nth-child(2)').classList.add('active');
-                document.getElementById('dayView').classList.add('active');
-            }
-            
+        function deleteUser(acc) {
+            openConfirmModal('删除用户', `确定要删除账户 ${acc} 吗？`, () => {
+                users = users.filter(u => u.account !== acc); 
+                saveUsersToStorage(); renderUsers();
+            });
+        }
+
+        // --- 日历视图逻辑 ---
+        function setCalendarView(view) {
+            currentCalendarView = view;
+            document.getElementById('cal-tab-month').className = view === 'month' ? "px-4 py-1.5 text-sm font-medium rounded-md bg-law-navy text-white transition-all" : "px-4 py-1.5 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-100 transition-all";
+            document.getElementById('cal-tab-week').className = view === 'week' ? "px-4 py-1.5 text-sm font-medium rounded-md bg-law-navy text-white transition-all" : "px-4 py-1.5 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-100 transition-all";
+            document.getElementById('cal-tab-day').className = view === 'day' ? "px-4 py-1.5 text-sm font-medium rounded-md bg-law-navy text-white transition-all" : "px-4 py-1.5 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-100 transition-all";
             renderCalendar();
         }
-        
-        function renderCalendar() {
-            if (calendarView === 'month') renderMonthView();
-            else if (calendarView === 'day') renderDayView();
+
+        function prevCalendarStep() {
+            if(currentCalendarView === 'month') calendarDate.setMonth(calendarDate.getMonth() - 1);
+            else if(currentCalendarView === 'week') calendarDate.setDate(calendarDate.getDate() - 7);
+            else calendarDate.setDate(calendarDate.getDate() - 1);
+            renderCalendar();
         }
-        
-        function renderMonthView() {
-            const year = currentDate.getFullYear();
-            const month = currentDate.getMonth();
-            
-            document.getElementById('currentMonth').textContent = `${year}年${month + 1}月`;
-            
-            const firstDay = new Date(year, month, 1);
-            const lastDay = new Date(year, month + 1, 0);
-            const startDate = new Date(firstDay);
-            startDate.setDate(startDate.getDate() - firstDay.getDay());
-            
-            const grid = document.getElementById('monthGrid');
-            grid.innerHTML = '';
-            
-            // 星期标题
-            const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
-            weekdays.forEach(day => {
-                const header = document.createElement('div');
-                header.className = 'calendar-day-header';
-                header.textContent = day;
-                grid.appendChild(header);
+
+        function nextCalendarStep() {
+            if(currentCalendarView === 'month') calendarDate.setMonth(calendarDate.getMonth() + 1);
+            else if(currentCalendarView === 'week') calendarDate.setDate(calendarDate.getDate() + 7);
+            else calendarDate.setDate(calendarDate.getDate() + 1);
+            renderCalendar();
+        }
+
+        function getEventsForDateStr(dateStr, includeCases = true) {
+            const dayTasks = activeTasks.filter(t => t.datetime && t.datetime.startsWith(dateStr));
+            const dayCases = includeCases ? cases.filter(c => c.status === '进行中' && c.taskDL === dateStr) : [];
+            let eventsHtml = '';
+            dayTasks.forEach(t => {
+                const colorClass = taskColorMap[t.color] || taskColorMap['blue'];
+                eventsHtml += `<div class="text-xs ${colorClass} rounded px-1.5 py-1 mb-1 truncate border" title="${t.title}" onclick="event.stopPropagation()"><i class="fa-solid fa-list-check mr-1"></i>${t.title}</div>`;
             });
-            
-            // 日期格子
-            for (let i = 0; i < 42; i++) {
-                const cellDate = new Date(startDate);
-                cellDate.setDate(startDate.getDate() + i);
-                
-                const dayCell = document.createElement('div');
-                dayCell.className = 'calendar-day';
-                
-                if (cellDate.getMonth() !== month) dayCell.classList.add('other-month');
-                if (isSameDay(cellDate, new Date())) dayCell.classList.add('today');
-                if (isSameDay(cellDate, currentDate)) dayCell.classList.add('selected');
-                
-                dayCell.innerHTML = `<div class="day-number">${cellDate.getDate()}</div>`;
-                dayCell.onclick = () => selectDate(cellDate);
-                
-                // 添加事件
-                const dayEvents = tasks.filter(task => isSameDay(new Date(task.date), cellDate));
-                dayEvents.forEach(event => {
-                    const eventDiv = document.createElement('div');
-                    eventDiv.className = `calendar-event ${event.caseId ? 'case-related' : 'reminder'}`;
-                    eventDiv.innerHTML = `<div class="event-time">${formatTime(new Date(event.date))}</div><div class="event-title">${event.title}</div>`;
-                    dayCell.appendChild(eventDiv);
-                });
-                
-                grid.appendChild(dayCell);
-            }
+            dayCases.forEach(c => {
+                eventsHtml += `<div class="text-xs bg-gray-100 text-gray-800 rounded px-1.5 py-1 mb-1 truncate border border-gray-300 hover:bg-gray-200" title="${c.name}" onclick="event.stopPropagation(); openCaseDetail('${c.id}')"><i class="fa-solid fa-gavel mr-1"></i>DL: ${c.name}</div>`;
+            });
+            return eventsHtml;
         }
-        
-        function renderDayView() {
-            document.getElementById('currentDay').textContent = formatDate(currentDate);
-            const dayEvents = tasks.filter(task => isSameDay(new Date(task.date), currentDate));
-            const container = document.getElementById('dayEvents');
-            
-            if (dayEvents.length === 0) {
-                container.innerHTML = '<p style="text-align:center; color:#718096; padding:80px; font-size:18px;">今日无安排</p>';
-            } else {
-                let html = '';
-                for (let hour = 0; hour < 24; hour++) {
-                    const hourEvents = dayEvents.filter(event => new Date(event.date).getHours() === hour);
-                    if (hourEvents.length > 0) {
-                        html += `
-                            <div class="time-slot">
-                                <div class="time-label">${hour.toString().padStart(2, '0')}:00</div>
-                                <div class="time-content">
-                                    ${hourEvents.map(event => `
-                                        <div class="day-event ${event.caseId ? 'case-related' : 'reminder'}">
-                                            <div class="event-time">${formatTime(new Date(event.date))}</div>
-                                            <div class="event-title">${event.title}</div>
-                                            ${event.description ? `<div class="event-desc">${event.description}</div>` : ''}
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        `;
+
+        function renderCalendar() {
+            const container = document.getElementById('calendar-container');
+            container.innerHTML = '';
+            const year = calendarDate.getFullYear();
+            const month = calendarDate.getMonth();
+            const date = calendarDate.getDate();
+
+            if (currentCalendarView === 'month') {
+                document.getElementById('calendar-date-display').textContent = `${year}年 ${month + 1}月`;
+                
+                const firstDay = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                
+                let html = `
+                <div class="calendar-grid-month">
+                    <div class="calendar-header-cell">日</div><div class="calendar-header-cell">一</div><div class="calendar-header-cell">二</div>
+                    <div class="calendar-header-cell">三</div><div class="calendar-header-cell">四</div><div class="calendar-header-cell">五</div><div class="calendar-header-cell">六</div>
+                </div>
+                <div class="calendar-grid-month mt-[1px] border-t-0 rounded-t-none">`;
+                
+                for(let i = 0; i < firstDay; i++) html += `<div class="calendar-cell bg-gray-50"></div>`;
+                
+                const today = new Date();
+                for(let day = 1; day <= daysInMonth; day++) {
+                    const dateStr = `${year}-${String(month+1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    const eventsHtml = getEventsForDateStr(dateStr);
+                    const isToday = (year === today.getFullYear() && month === today.getMonth() && day === today.getDate());
+                    const dayClass = isToday ? 'bg-law-gold/10 font-bold text-law-navy' : 'text-gray-700';
+                    const circleClass = isToday ? 'bg-law-navy text-white rounded-full w-6 h-6 flex items-center justify-center' : '';
+                    
+                    html += `
+                        <div class="calendar-cell ${dayClass}" onclick="openTaskModalWithDate('${dateStr}T09:00')">
+                            <div class="flex justify-end mb-1"><span class="${circleClass}">${day}</span></div>
+                            <div class="flex flex-col space-y-1">${eventsHtml}</div>
+                        </div>`;
+                }
+                
+                const totalCells = firstDay + daysInMonth;
+                const remainingCells = (7 - (totalCells % 7)) % 7;
+                for(let i = 0; i < remainingCells; i++) html += `<div class="calendar-cell bg-gray-50"></div>`;
+                
+                html += `</div>`;
+                container.innerHTML = html;
+
+            } else if (currentCalendarView === 'week') {
+                const startOfWeek = new Date(calendarDate);
+                startOfWeek.setDate(calendarDate.getDate() - calendarDate.getDay()); // Sunday
+                const endOfWeek = new Date(startOfWeek);
+                endOfWeek.setDate(startOfWeek.getDate() + 6);
+                
+                document.getElementById('calendar-date-display').textContent = `${startOfWeek.getMonth()+1}/${startOfWeek.getDate()} - ${endOfWeek.getMonth()+1}/${endOfWeek.getDate()}, ${year}`;
+
+                let html = `<div class="calendar-grid-week"><div class="calendar-header-cell border-r border-gray-200">时间</div>`;
+                const days = ['日', '一', '二', '三', '四', '五', '六'];
+                for(let d=0; d<7; d++) {
+                    const cellDate = new Date(startOfWeek); cellDate.setDate(startOfWeek.getDate() + d);
+                    html += `<div class="calendar-header-cell">${days[d]} (${cellDate.getMonth()+1}/${cellDate.getDate()})</div>`;
+                }
+                html += `</div><div class="calendar-grid-week mt-[1px] border-t-0 rounded-t-none">`;
+
+                for(let h=0; h<24; h++) {
+                    const timeStr = `${String(h).padStart(2,'0')}:00`;
+                    html += `<div class="time-label border-r border-gray-200">${timeStr}</div>`;
+                    for(let d=0; d<7; d++) {
+                        const cellDate = new Date(startOfWeek); cellDate.setDate(startOfWeek.getDate() + d);
+                        const dateStr = `${cellDate.getFullYear()}-${String(cellDate.getMonth()+1).padStart(2, '0')}-${String(cellDate.getDate()).padStart(2, '0')}`;
+                        const fullDateStr = `${dateStr}T${String(h).padStart(2,'0')}`;
+                        
+                        // 获取该小时的任务
+                        const eventsHtml = getEventsForDateStr(fullDateStr, false);
+                        html += `<div class="calendar-cell-time" onclick="openTaskModalWithDate('${fullDateStr}:00')">${eventsHtml}</div>`;
                     }
                 }
-                container.innerHTML = html || '<p style="text-align:center; color:#718096; padding:80px; font-size:18px;">今日无安排</p>';
+                html += `</div>`;
+                container.innerHTML = html;
+
+            } else if (currentCalendarView === 'day') {
+                document.getElementById('calendar-date-display').textContent = `${year}年 ${month + 1}月 ${date}日`;
+                
+                const dateStr = `${year}-${String(month+1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+                
+                let html = `<div class="calendar-grid-day"><div class="calendar-header-cell border-r border-gray-200">时间</div><div class="calendar-header-cell">任务安排</div></div>`;
+                html += `<div class="calendar-grid-day mt-[1px] border-t-0 rounded-t-none">`;
+                
+                for(let h=0; h<24; h++) {
+                    const timeStr = `${String(h).padStart(2,'0')}:00`;
+                    const fullDateStr = `${dateStr}T${String(h).padStart(2,'0')}`;
+                    const eventsHtml = getEventsForDateStr(fullDateStr, false);
+                    
+                    html += `<div class="time-label border-r border-gray-200">${timeStr}</div>
+                             <div class="calendar-cell-time" onclick="openTaskModalWithDate('${fullDateStr}:00')">${eventsHtml}</div>`;
+                }
+                html += `</div>`;
+                container.innerHTML = html;
             }
         }
-        
-        function selectDate(date) {
-            currentDate = new Date(date);
-            if (calendarView === 'month') {
-                switchCalendarView('day');
-            } else {
-                renderDayView();
+
+        // --- 拖拽排序核心逻辑 ---
+        function handleDragStart(e, type, index) {
+            dragSrcEl = e.target.closest('tr') || e.target.closest('.draggable-item');
+            dragSrcEl.classList.add('dragging'); dragType = type;
+            e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', index);
+        }
+        function handleDragOver(e) {
+            e.preventDefault(); e.dataTransfer.dropEffect = 'move';
+            const target = e.target.closest('tr') || e.target.closest('.draggable-item');
+            if(target && target !== dragSrcEl) target.classList.add('drag-over');
+            return false;
+        }
+        function handleDragLeave(e) {
+            const target = e.target.closest('tr') || e.target.closest('.draggable-item');
+            if(target) target.classList.remove('drag-over');
+        }
+        function handleDrop(e, type, targetIndex) {
+            e.stopPropagation();
+            const target = e.target.closest('tr') || e.target.closest('.draggable-item');
+            if(target) target.classList.remove('drag-over');
+            if(dragSrcEl) dragSrcEl.classList.remove('dragging');
+            if(dragType !== type) return false;
+            
+            const sourceIndex = parseInt(e.dataTransfer.getData('text/plain'), 10);
+            if(sourceIndex === targetIndex) return false;
+
+            if(type === 'task') {
+                const item = activeTasks.splice(sourceIndex, 1)[0];
+                activeTasks.splice(targetIndex, 0, item);
+                renderTasks();
+            } else if(type === 'case') {
+                const filteredCases = getFilteredCases();
+                const sourceCase = filteredCases[sourceIndex], targetCase = filteredCases[targetIndex];
+                const realSourceIdx = cases.findIndex(c => c.id === sourceCase.id);
+                const realTargetIdx = cases.findIndex(c => c.id === targetCase.id);
+                const item = cases.splice(realSourceIdx, 1)[0];
+                cases.splice(realTargetIdx, 0, item);
+                renderCases();
             }
+            return false;
         }
-        
-        function changeMonth(delta) {
-            currentDate.setMonth(currentDate.getMonth() + delta);
-            renderMonthView();
+
+        // --- 待办任务 ---
+        function openTaskModal() { 
+            document.getElementById('task-title').value = ''; 
+            document.getElementById('task-datetime').value = new Date().toISOString().slice(0,16); 
+            document.querySelector('input[name="taskColor"][value="blue"]').checked = true;
+            openModal('modal-task'); 
         }
-        
-        function changeDay(delta) {
-            currentDate.setDate(currentDate.getDate() + delta);
-            renderDayView();
+        function openTaskModalWithDate(datetimeStr) {
+            document.getElementById('task-title').value = ''; 
+            document.getElementById('task-datetime').value = datetimeStr; 
+            document.querySelector('input[name="taskColor"][value="blue"]').checked = true;
+            openModal('modal-task'); 
         }
-        
-        function goToToday() {
-            currentDate = new Date();
-            renderCalendar();
-        }
-        
-        // 任务管理
-        function showAddTaskModal() {
-            document.getElementById('taskModal').style.display = 'block';
-            const now = new Date();
-            now.setMinutes(now.getMinutes() + 30);
-            document.getElementById('taskDate').value = formatDateTimeLocal(now);
-        }
-        
-        function closeTaskModal() {
-            document.getElementById('taskModal').style.display = 'none';
-        }
-        
         function saveTask() {
-            const title = document.getElementById('taskTitle').value.trim();
-            const caseId = document.getElementById('taskCase').value;
-            const date = document.getElementById('taskDate').value;
-            const description = document.getElementById('taskDescription').value.trim();
-            
-            if (!title || !date) {
-                alert('请填写任务标题和时间');
-                return;
+            const title = document.getElementById('task-title').value;
+            const datetime = document.getElementById('task-datetime').value;
+            const color = document.querySelector('input[name="taskColor"]:checked').value;
+            if (!title) return alert('请填写必填项');
+            activeTasks.push({ id: Date.now(), title, datetime, color });
+            renderTasks(); renderCalendar(); closeModal('modal-task');
+        }
+        function completeTask(taskId) {
+            const index = activeTasks.findIndex(t => t.id === taskId);
+            if(index > -1) {
+                const task = activeTasks.splice(index, 1)[0]; 
+                task.completedAt = new Date().toLocaleString('zh-CN');
+                completedTasks.push(task); renderTasks(); renderCompletedTasks(); renderCalendar();
             }
-            
-            const newTask = {
-                id: Date.now(),
-                title,
-                caseId: caseId || null,
-                date: new Date(date).toISOString(),
-                description,
-                completed: false,
-                createdAt: new Date().toISOString()
-            };
-            
-            tasks.push(newTask);
-            localStorage.setItem('tasks', JSON.stringify(tasks));
-            
-            closeTaskModal();
-            renderTasks();
-            renderCalendar();
-            updateTodayTasks();
         }
-        
-        function updateTaskCaseOptions() {
-            const select = document.getElementById('taskCase');
-            select.innerHTML = '<option value="">无关联案件</option>' + cases.map(c => 
-                `<option value="${c.id}">${c.caseNumber} - ${c.caseName}</option>`
-            ).join('');
+        function promptDeleteTask(taskId) {
+            openConfirmModal('删除待办任务', '确定要删除这个待办任务吗？', () => {
+                activeTasks = activeTasks.filter(t => t.id !== taskId); renderTasks(); renderCalendar();
+            });
         }
-        
-        function updateTodayTasks() {
-            const today = new Date();
-            const todayTasks = tasks.filter(task => isSameDay(new Date(task.date), today)).sort((a, b) => new Date(a.date) - new Date(b.date));
-            const container = document.getElementById('todayTasks');
+        function renderTasks() {
+            const container = document.getElementById('task-list-container'); container.innerHTML = '';
+            if (activeTasks.length === 0) { container.innerHTML = '<div class="p-8 text-center text-gray-400">暂无待办任务</div>'; return; }
             
-            if (todayTasks.length === 0) {
-                container.innerHTML = '<p style="color: #718096; text-align: center; padding: 40px; font-size: 18px;">今日无任务</p>';
-            } else {
-                container.innerHTML = todayTasks.map(task => {
-                    const caseInfo = task.caseId ? cases.find(c => c.id == task.caseId) : null;
-                    return `
-                        <div class="task-item ${task.completed ? 'completed' : ''}">
-                            <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id})">
-                            <div class="task-content">
-                                <div class="task-title">${task.title}</div>
-                                <div class="task-meta">
-                                    <span class="task-time">${formatTime(new Date(task.date))}</span>
-                                    ${caseInfo ? `<span class="task-case">${caseInfo.caseNumber}</span>` : ''}
-                                </div>
-                            </div>
+            activeTasks.forEach((t, idx) => {
+                const d = new Date(t.datetime);
+                const deleteBtn = currentUser.role === 'admin' ? `<button onclick="promptDeleteTask(${t.id})" class="text-gray-300 hover:text-red-500 transition-colors" title="删除任务"><i class="fa-regular fa-trash-can text-xl"></i></button>` : '';
+                const colorClass = taskColorMap[t.color] || taskColorMap['blue'];
+
+                container.innerHTML += `
+                    <div class="draggable-item px-6 py-4 border-b border-gray-100 hover:bg-gray-50 flex items-center justify-between cursor-move"
+                         draggable="true" ondragstart="handleDragStart(event, 'task', ${idx})" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'task', ${idx})">
+                        <div class="flex items-center">
+                            <i class="fa-solid fa-grip-vertical text-gray-300 mr-4"></i>
+                            <span class="text-sm font-bold text-law-navy mr-4">${d.toLocaleDateString('zh-CN')} ${d.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})}</span>
+                            <span class="px-2 py-1 rounded text-sm font-semibold ${colorClass}">${t.title}</span>
                         </div>
-                    `;
-                }).join('');
+                        <div class="flex space-x-3">
+                            <button onclick="completeTask(${t.id})" class="text-gray-300 hover:text-green-500 transition-colors" title="标记完成"><i class="fa-regular fa-circle-check text-xl"></i></button>
+                            ${deleteBtn}
+                        </div>
+                    </div>`;
+            });
+        }
+
+        // --- 案件管理 ---
+        function toggleCaseDateInput() {
+            const status = document.getElementById('case-status').value;
+            if(status === '进行中') {
+                document.getElementById('div-task-dl').classList.remove('hidden'); document.getElementById('div-close-date').classList.add('hidden');
+            } else {
+                document.getElementById('div-task-dl').classList.add('hidden'); document.getElementById('div-close-date').classList.remove('hidden');
             }
         }
-        
-        function toggleTask(id) {
-            const task = tasks.find(t => t.id === id);
-            if (task) {
-                task.completed = !task.completed;
-                localStorage.setItem('tasks', JSON.stringify(tasks));
-                updateTodayTasks();
+        function openCaseModal() { 
+            document.getElementById('modal-case-title').textContent = '添加案件'; document.getElementById('case-form-mode').value = 'add';
+            document.getElementById('case-id').value = ''; document.getElementById('case-name').value = ''; document.getElementById('case-client').value = ''; 
+            document.getElementById('case-status').value = '进行中'; document.getElementById('case-task-dl').value = ''; document.getElementById('case-close-date').value = '';
+            toggleCaseDateInput(); openModal('modal-case'); 
+        }
+        function openEditCaseModal() {
+            const c = cases.find(x => x.id === currentViewCaseId); if (!c) return;
+            document.getElementById('modal-case-title').textContent = '修改案件信息'; document.getElementById('case-form-mode').value = 'edit';
+            document.getElementById('case-id').value = c.id; document.getElementById('case-name').value = c.name; document.getElementById('case-client').value = c.client;
+            document.getElementById('case-status').value = c.status; document.getElementById('case-task-dl').value = c.taskDL || ''; document.getElementById('case-close-date').value = c.closeDate || '';
+            toggleCaseDateInput(); openModal('modal-case');
+        }
+        function saveCase() {
+            const mode = document.getElementById('case-form-mode').value;
+            const id = document.getElementById('case-id').value, name = document.getElementById('case-name').value, client = document.getElementById('case-client').value, status = document.getElementById('case-status').value;
+            const taskDL = document.getElementById('case-task-dl').value, closeDate = document.getElementById('case-close-date').value;
+            if (!id || !name) return alert('请填写必填项');
+            
+            if(mode === 'add') cases.push({ id, name, client, status, taskDL, closeDate, logs: [] });
+            else {
+                const c = cases.find(x => x.id === currentViewCaseId);
+                if(c) { c.id = id; c.name = name; c.client = client; c.status = status; c.taskDL = taskDL; c.closeDate = closeDate; currentViewCaseId = c.id; openCaseDetail(c.id); }
             }
+            renderCases(); renderCalendar(); closeModal('modal-case');
         }
-        
-        // 工具函数
-        function isSameDay(date1, date2) {
-            return date1.getFullYear() === date2.getFullYear() &&
-                   date1.getMonth() === date2.getMonth() &&
-                   date1.getDate() === date2.getDate();
+        function promptDeleteCase() {
+            const c = cases.find(x => x.id === currentViewCaseId); if(!c) return;
+            openConfirmModal('删除案件', `确定要彻底删除案件 [${c.id}] 吗？`, () => {
+                cases = cases.filter(x => x.id !== currentViewCaseId); switchTab('cases'); renderCases(); renderCalendar();
+            });
         }
-        
-        function formatDate(date) {
-            return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+        function setCaseTab(tab) {
+            currentCaseTab = tab;
+            const btnOngoing = document.getElementById('tab-ongoing'), btnCompleted = document.getElementById('tab-completed');
+            if(tab === 'ongoing') {
+                btnOngoing.className = "px-4 py-2 text-sm font-medium rounded-md bg-white shadow-sm text-law-navy transition-all";
+                btnCompleted.className = "px-4 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 transition-all";
+                document.getElementById('case-status-header').textContent = '任务DL';
+            } else {
+                btnCompleted.className = "px-4 py-2 text-sm font-medium rounded-md bg-white shadow-sm text-law-navy transition-all";
+                btnOngoing.className = "px-4 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 transition-all";
+                document.getElementById('case-status-header').textContent = '结案时间';
+            }
+            renderCases();
         }
-        
-        function formatTime(date) {
-            return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+        function getFilteredCases() {
+            return cases.filter(c => {
+                let isCompleted = (c.status === '已结案');
+                if(currentCaseTab === 'ongoing' && isCompleted) return false;
+                if(currentCaseTab === 'completed' && !isCompleted) return false;
+                return true;
+            });
         }
-        
-        function formatDateTimeLocal(date) {
-            const year = date.getFullYear();
-            const month = (date.getMonth() + 1).toString().padStart(2, '0');
-            const day = date.getDate().toString().padStart(2, '0');
-            const hours = date.getHours().toString().padStart(2, '0');
-            const minutes = date.getMinutes().toString().padStart(2, '0');
-            return `${year}-${month}-${day}T${hours}:${minutes}`;
+        function renderCases() {
+            const tbody = document.getElementById('case-list-body'); tbody.innerHTML = '';
+            const filteredCases = getFilteredCases();
+            if (filteredCases.length === 0) { tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-gray-400">没有找到符合条件的案件</td></tr>`; return; }
+
+            filteredCases.forEach((c, idx) => {
+                const latestLog = c.logs.length > 0 ? c.logs[0].content : '暂无动态记录';
+                const dateDisplay = currentCaseTab === 'ongoing' ? (c.taskDL || '-') : (c.closeDate || '-');
+                const badgeColor = currentCaseTab === 'ongoing' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700';
+                
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50 transition-colors cursor-move group" draggable="true" ondragstart="handleDragStart(event, 'case', ${idx})" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'case', ${idx})">
+                        <td class="px-6 py-4 text-gray-300 align-top"><i class="fa-solid fa-grip-vertical"></i></td>
+                        <td class="px-6 py-4 font-medium text-law-navy align-top cursor-pointer" onclick="openCaseDetail('${c.id}')">${c.id}</td>
+                        <td class="px-6 py-4 align-top cursor-pointer" onclick="openCaseDetail('${c.id}')">
+                            <div class="text-gray-800 font-medium">${c.name}</div>
+                            <div class="text-xs text-gray-500 mt-1 line-clamp-2"><span class="text-law-gold mr-1"><i class="fa-solid fa-clock-rotate-left"></i> 最新:</span>${latestLog}</div>
+                        </td>
+                        <td class="px-6 py-4 text-gray-600 align-top cursor-pointer" onclick="openCaseDetail('${c.id}')">${c.client}</td>
+                        <td class="px-6 py-4 align-top cursor-pointer" onclick="openCaseDetail('${c.id}')"><span class="px-2.5 py-1 text-xs font-medium rounded-full ${badgeColor}">${dateDisplay}</span></td>
+                        <td class="px-6 py-4 text-right text-law-gold align-top cursor-pointer" onclick="openCaseDetail('${c.id}')"><i class="fa-solid fa-chevron-right mt-1"></i></td>
+                    </tr>`;
+            });
         }
-        
-        // 初始化
-        document.getElementById('mainPage').style.display = 'none';
-        document.getElementById('loginPage').style.display = 'flex';
+
+        // --- 案件动态逻辑 ---
+        function openCaseDetail(caseId) {
+            const c = cases.find(x => x.id === caseId); if(!c) return;
+            currentViewCaseId = caseId;
+            document.getElementById('detail-case-name').textContent = c.name; document.getElementById('detail-case-id').textContent = c.id; document.getElementById('detail-case-client').textContent = c.client;
+            if(c.status === '进行中') { document.getElementById('detail-date-label').textContent = '任务DL'; document.getElementById('detail-case-date').textContent = c.taskDL || '-'; } 
+            else { document.getElementById('detail-date-label').textContent = '结案时间'; document.getElementById('detail-case-date').textContent = c.closeDate || '-'; }
+            document.getElementById('detail-case-status').textContent = c.status;
+            
+            const btnDelete = document.getElementById('btn-delete-case');
+            if(currentUser.role === 'admin') btnDelete.classList.remove('hidden'); else btnDelete.classList.add('hidden');
+            
+            renderCaseLogs(); switchTab('case-detail');
+        }
+        function addCaseLog() {
+            const content = document.getElementById('case-log-input').value.trim(); if(!content) return;
+            const c = cases.find(x => x.id === currentViewCaseId);
+            c.logs.unshift({ id: Date.now(), time: new Date().toLocaleString('zh-CN'), author: currentUser.username, content: content });
+            document.getElementById('case-log-input').value = ''; renderCaseLogs(); renderCases();
+        }
+        function deleteCaseLog(logId) {
+            const c = cases.find(x => x.id === currentViewCaseId);
+            c.logs = c.logs.filter(l => l.id !== logId); renderCaseLogs(); renderCases();
+        }
+        function renderCaseLogs() {
+            const c = cases.find(x => x.id === currentViewCaseId);
+            const container = document.getElementById('case-logs-container'); container.innerHTML = '';
+            if(c.logs.length === 0) { container.innerHTML = '<p class="text-gray-400 text-sm ml-6">暂无案件动态记录。</p>'; return; }
+
+            c.logs.forEach(log => {
+                const deleteBtn = currentUser.role === 'admin' ? `<button onclick="deleteCaseLog(${log.id})" class="text-red-500 hover:text-red-700 text-xs"><i class="fa-solid fa-trash"></i> 删除</button>` : '';
+                container.innerHTML += `
+                    <div class="relative pl-6 group">
+                        <div class="absolute w-3 h-3 bg-law-gold rounded-full -left-[7px] top-1.5 border-2 border-white"></div>
+                        <div class="flex justify-between items-center mb-1">
+                            <p class="text-xs text-gray-500 font-mono">${log.time} · 记录人: <span class="font-semibold text-law-navy">${log.author || '未知'}</span></p>
+                            <div class="opacity-0 group-hover:opacity-100 transition-opacity space-x-2">${deleteBtn}</div>
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded-lg border border-gray-100 text-gray-700 text-sm whitespace-pre-wrap">${log.content}</div>
+                    </div>`;
+            });
+        }
+        function exportLogsToExcel() {
+            const c = cases.find(x => x.id === currentViewCaseId);
+            if (!c || c.logs.length === 0) return alert('当前案件没有可导出的动态记录。');
+            
+            let csvContent = "\uFEFF时间,记录人,内容\n"; // 添加BOM头以支持Excel中的UTF-8
+            c.logs.forEach(l => {
+                let content = l.content.replace(/"/g, '""'); // 转义引号
+                csvContent += `"${l.time}","${l.author}","${content}"\n`;
+            });
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `${c.name}_动态记录.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // --- 已完成任务 ---
+        function promptDeleteCompletedTask(taskId) {
+            openConfirmModal('删除已完成任务', '确定要永久删除这条已完成记录吗？', () => {
+                completedTasks = completedTasks.filter(t => t.id !== taskId); renderCompletedTasks();
+            });
+        }
+        function renderCompletedTasks() {
+            const container = document.getElementById('completed-task-container'); container.innerHTML = '';
+            if (completedTasks.length === 0) { container.innerHTML = '<div class="p-8 text-center text-gray-400">暂无已完成任务</div>'; return; }
+            
+            [...completedTasks].reverse().forEach(t => {
+                const deleteBtn = currentUser.role === 'admin' ? `<button onclick="promptDeleteCompletedTask(${t.id})" class="text-gray-400 hover:text-red-500 transition-colors p-2" title="彻底删除"><i class="fa-solid fa-trash"></i></button>` : '';
+                container.innerHTML += `
+                    <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                        <div class="flex flex-col">
+                            <div class="flex items-center text-gray-500 line-through"><i class="fa-solid fa-check text-green-500 mr-3"></i><span class="font-semibold">${t.title}</span></div>
+                            <div class="text-xs text-gray-400 mt-1 ml-7">完成时间: ${t.completedAt}</div>
+                        </div>
+                        ${deleteBtn}
+                    </div>`;
+            });
+        }
     </script>
 </body>
 </html>
